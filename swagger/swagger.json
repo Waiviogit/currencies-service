@@ -65,20 +65,10 @@
       }
     },
     "weekly_def": {
-      "type" : "object",
-      "properties" : {
-        "1": {
-          "type": "object",
-            "$ref": "#/definitions/current_def"
-        },
-        "2": {
-          "type": "object",
-          "$ref": "#/definitions/current_def"
-        },
-        "3": {
-          "type": "object",
-          "$ref": "#/definitions/current_def"
-        }
+      "type" : "array",
+      "items" : {
+        "type": "object",
+        "$ref": "#/definitions/current_def"
       }
     },
     "current_def": {

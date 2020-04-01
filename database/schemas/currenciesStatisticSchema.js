@@ -12,18 +12,23 @@ const currency = () => {
   return data;
 };
 
-const currencySchema = new Schema(currency());
+const currencySchema = new Schema(currency(), { _id: false });
 
 const statistic = () => {
   const data = {};
   for (const id of serviceData.allowedIds) {
     data[id] = { type: currencySchema, required: true };
   }
+  data.type = {
+    type: String, default: 'ordinaryData', valid: ['ordinaryData', 'dailyData'], index: true,
+  };
   return data;
 };
 
-const currenciesStatisticSchema = new Schema(statistic());
+const currenciesStatisticSchema = new Schema(statistic(), { timestamps: true });
 
-const currenciesSchema = mongoose.model('currenciesStatistic', currenciesStatisticSchema);
+currenciesStatisticSchema.index({ createdAt: 1 });
+
+const currenciesSchema = mongoose.model('currencies-statistic', currenciesStatisticSchema);
 
 module.exports = currenciesSchema;

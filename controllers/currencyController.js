@@ -5,6 +5,7 @@ const show = async (req, res, next) => {
   const value = validators.validate({
     ids: req.query.ids,
     currencies: req.query.currencies,
+    resource: req.query.resource || 'coingecko',
   }, validators.currency.currencySchema, next);
   if (!value) return;
   const { result, error } = await currencyOperations.getCurrencies(value);

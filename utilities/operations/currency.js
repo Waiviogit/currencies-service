@@ -1,19 +1,9 @@
 const { currencyHelper } = require('utilities/helpers');
 
-exports.getCurrencies = async ({ ids, currencies }) => {
+exports.getCurrencies = async (data) => {
   const result = {};
-  const { result: currentCurrency, error } = await currencyHelper.getCurrenciesFromRequest(
-    { ids, currencies },
-  );
+  const { result: currentCurrency } = await currencyHelper.getCurrentCurrencies(data);
   result.current = currentCurrency;
-  result.weekly = {
-    1: {},
-    2: {},
-    3: {},
-    4: {},
-    5: {},
-    6: {},
-    7: {},
-  };
+  result.weekly = await currencyHelper.getWeaklyCurrencies();
   return { result };
 };

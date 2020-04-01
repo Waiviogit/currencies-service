@@ -1,5 +1,5 @@
 
-const allowedIds = ['hive', 'hive_dollars'];
+const allowedIds = ['hive', 'hive_dollar'];
 const allowedCurrencies = ['usd', 'btc'];
 
 module.exports = { allowedIds, allowedCurrencies };

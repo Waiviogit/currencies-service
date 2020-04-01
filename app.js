@@ -5,6 +5,7 @@ const swaggerUi = require('swagger-ui-express');
 const bodyParser = require('body-parser');
 const { routes } = require('routes');
 const swaggerDocument = require('swagger');
+require('jobs');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
