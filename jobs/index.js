@@ -1,3 +1,4 @@
-const { ordinatyStatisticsJob } = require('./collectStatistics');
+const { ordinaryStatisticsJob, dailyStatisticsJob } = require('./collectStatistics');
 
-ordinatyStatisticsJob.start();
+ordinaryStatisticsJob.start();
+dailyStatisticsJob.start();
