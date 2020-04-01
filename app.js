@@ -13,7 +13,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.listen(process.env.PORT || 8001);
 app.use('/', routes);
-app.use('/currencies-service/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/currencies-api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res, next) => {
   res.status(res.result.status || 200).json(res.result.json);
