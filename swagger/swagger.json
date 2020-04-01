@@ -20,7 +20,7 @@
     "http"
   ],
   "paths" : {
-    "/marketInfo" : {
+    "/currencies-api/marketInfo" : {
       "get" : {
         "tags" : [ "market" ],
         "summary" : "Get data about currencies",
@@ -52,6 +52,36 @@
   },
   "definitions" : {
     "market_response": {
+      "type" : "object",
+      "properties" : {
+        "current" : {
+          "type" : "object",
+          "$ref": "#/definitions/current_def"
+        },
+        "weekly" : {
+          "type" : "object",
+          "$ref": "#/definitions/weekly_def"
+        }
+      }
+    },
+    "weekly_def": {
+      "type" : "object",
+      "properties" : {
+        "1": {
+          "type": "object",
+            "$ref": "#/definitions/current_def"
+        },
+        "2": {
+          "type": "object",
+          "$ref": "#/definitions/current_def"
+        },
+        "3": {
+          "type": "object",
+          "$ref": "#/definitions/current_def"
+        }
+      }
+    },
+    "current_def": {
       "type" : "object",
       "properties" : {
         "hive_dollar" : {

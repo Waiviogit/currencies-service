@@ -4,27 +4,31 @@
       "host": "localhost",
       "port": 27017,
       "database": "Currencies"
-    }
+    },
+    "swaggerHost": "www.waivio.com"
   },
   "staging": {
     "db": {
       "host": "localhost",
       "port": 27017,
       "database": "Currencies"
-    }
+    },
+    "swaggerHost": "waiviodev.com"
   },
   "development": {
     "db": {
       "host": "localhost",
       "port": 27017,
       "database": "Currencies"
-    }
+    },
+    "swaggerHost": "localhost:8001"
   },
   "test": {
     "db": {
       "host": "localhost",
       "port": 27017,
       "database": "CurrenciesTest"
-    }
+    },
+    "swaggerHost": "localhost:8001"
   }
 }
