@@ -1,0 +1,85 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Service for save currency data and display charts",
+    "version": "1.0.0",
+    "title": "Currency Service",
+    "contact": {
+      "email": "oleht@wizardsdev.com"
+    }
+  },
+  "host": "localhost:8001",
+  "tags": [
+    {
+      "name": "market",
+      "description": "Return data for some currencies"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths" : {
+    "/marketInfo" : {
+      "get" : {
+        "tags" : [ "market" ],
+        "summary" : "Get data about currencies",
+        "description" : "Return data on the current state of currencies and data on the state of the currency for the previous 7 days",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "ids",
+          "in" : "query",
+          "description" : "id of coins, more than one id supported",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "currencies",
+          "in" : "query",
+          "description" : "currency of coins, more than one currency supported",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+                "$ref" : "#/definitions/market_response"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "market_response": {
+      "type" : "object",
+      "properties" : {
+        "hive_dollar" : {
+          "type" : "object",
+          "$ref": "#/definitions/ids_def"
+        },
+        "hive" : {
+          "type" : "object",
+          "$ref": "#/definitions/ids_def"
+        }
+      }
+    },
+    "ids_def": {
+      "type" : "object",
+      "properties" : {
+        "usd": {
+          "type": "number"
+        },
+        "usd_24h_change": {
+          "type": "number"
+        },
+        "btc": {
+          "type": "number"
+        },
+        "btc_24h_change": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

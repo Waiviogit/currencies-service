@@ -1,0 +1,30 @@
+{
+  "production": {
+    "db": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "Currencies"
+    }
+  },
+  "staging": {
+    "db": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "Currencies"
+    }
+  },
+  "development": {
+    "db": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "Currencies"
+    }
+  },
+  "test": {
+    "db": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "CurrenciesTest"
+    }
+  }
+}
