@@ -31,13 +31,21 @@ const getCurrenciesFromRequest = async (data) => {
   }
 };
 
-const getWeaklyCurrencies = async () => [];
+const getWeaklyCurrencies = async () => {
+  const { result: weeklyCurrencies } = await currenciesStatisticsModel.find(
+    { condition: { type: 'dailyData' }, limit: 7 },
+  );
+  return weeklyCurrencies;
+};
 
 const collectStatistics = async (type, resource) => {
   const { result, error } = await getCurrenciesFromRequest(
     { ids: serviceData.allowedIds, currencies: serviceData.allowedCurrencies, resource },
   );
-  if (error || !result) return;
+  if (error || !result) {
+    console.error(error.message || 'Something wrong with request');
+    return;
+  }
   result.type = type;
   const { currencies } = await currenciesStatisticsModel.create(result);
   if (currencies) console.log(`Currencies successfully save at ${new Date()}`);
