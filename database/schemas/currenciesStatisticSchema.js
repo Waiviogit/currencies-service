@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
-const { serviceData } = require('constants/index');
+const serviceData = require('constants/serviceData');
 
 const { Schema } = mongoose;
 
 const currency = () => {
   const data = {};
   for (const curr of serviceData.allowedCurrencies) {
-    data[curr] = { type: String, required: true };
-    data[`${curr}_24h_change`] = { type: String, required: true };
+    data[curr] = { type: Number, required: true };
+    data[`${curr}_24h_change`] = { type: Number, required: true };
   }
   return data;
 };
