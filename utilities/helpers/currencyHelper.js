@@ -31,10 +31,11 @@ const getCurrenciesFromRequest = async (data) => {
   }
 };
 
-const getWeaklyCurrencies = async () => {
+const getWeaklyCurrencies = async (currentCurrency) => {
   const { result: weeklyCurrencies } = await currenciesStatisticsModel.find(
     { condition: { type: 'dailyData' }, limit: 7 },
   );
+  weeklyCurrencies[0] = currentCurrency;
   return weeklyCurrencies;
 };
 
