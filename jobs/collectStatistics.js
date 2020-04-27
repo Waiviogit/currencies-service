@@ -8,5 +8,5 @@ exports.ordinaryStatisticsJob = new CronJob('0 */5  * * * *', async () => {
 
 exports.dailyStatisticsJob = new CronJob('0 0 0 */1 * *', async () => {
   // add new currency statistic every 1 day
-  await currencyHelper.collectStatistics('dailyData', 'coingecko');
+  await currencyHelper.getDailyCurrency();
 }, null, true, null, null, false);

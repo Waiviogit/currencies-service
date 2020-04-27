@@ -27,4 +27,12 @@ const find = async ({
   }
 };
 
-module.exports = { find, create };
+const aggregate = async (pipeline) => {
+  try {
+    return { result: await CurrenciesSchema.aggregate(pipeline) };
+  } catch (error) {
+    return { error };
+  }
+};
+
+module.exports = { find, create, aggregate };
