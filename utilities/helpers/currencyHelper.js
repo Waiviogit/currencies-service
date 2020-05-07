@@ -64,6 +64,7 @@ const collectStatistics = async (type, resource) => {
 };
 
 const getDailyCurrency = async () => {
+  // destructuring property _ d for aggregation to work
   const { _d: startOfDay } = moment().startOf('day');
   const { _d: endOfDay } = moment().endOf('day');
 
