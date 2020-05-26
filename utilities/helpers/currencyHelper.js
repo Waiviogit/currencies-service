@@ -67,7 +67,6 @@ const getDailyCurrency = async () => {
   // destructuring property _ d for aggregation to work
   const { _d: startOfDay } = moment().startOf('day');
   const { _d: endOfDay } = moment().endOf('day');
-
   const { result, error } = await currenciesStatisticsModel.aggregate([{
     $match: {
       $and: [{ createdAt: { $gt: startOfDay } }, { createdAt: { $lt: endOfDay } }],
@@ -81,9 +80,9 @@ const getDailyCurrency = async () => {
       hive_dollar_btc: { $avg: '$hive_dollar.btc' },
       hive_dollar_btc_24h: { $avg: '$hive_dollar.btc_24h_change' },
       hive_usd: { $avg: '$hive.usd' },
-      hive_usd_24h_change: { $avg: '$hive.usd_24h_change' },
+      hive_usd_24h: { $avg: '$hive.usd_24h_change' },
       hive_btc: { $avg: '$hive.btc' },
-      hive_btc_24h_change: { $avg: '$hive.btc_24h_change' },
+      hive_btc_24h: { $avg: '$hive.btc_24h_change' },
     },
   }, {
     $project: {
@@ -93,16 +92,16 @@ const getDailyCurrency = async () => {
       'hive_dollar.usd_24h_change': '$hive_dollar_usd_24h',
       'hive_dollar.btc': '$hive_dollar_btc',
       'hive_dollar.btc_24h_change': '$hive_dollar_btc_24h',
-      'hive.usd': '$hive_dollar_usd',
-      'hive.usd_24h_change': '$hive_dollar_usd_24h',
-      'hive.btc': '$hive_dollar_btc',
-      'hive.btc_24h_change': '$hive_dollar_btc_24h',
+      'hive.usd': '$hive_usd',
+      'hive.usd_24h_change': '$hive_usd_24h',
+      'hive.btc': '$hive_btc',
+      'hive.btc_24h_change': '$hive_btc_24h',
     },
   },
   ]);
   if (error) return { error };
   const { currencies } = await currenciesStatisticsModel.create(result[0]);
-  if (currencies) console.log(`Currencies successfully save at ${new Date()}`);
+  if (currencies) console.log(`Daily currencies successfully save at ${new Date()}`);
 };
 
 module.exports = {
