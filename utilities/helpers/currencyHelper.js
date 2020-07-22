@@ -64,9 +64,8 @@ const collectStatistics = async (type, resource) => {
 };
 
 const getDailyCurrency = async () => {
-  // destructuring property _ d for aggregation to work
-  const { _d: startOfDay } = moment().startOf('day');
-  const { _d: endOfDay } = moment().endOf('day');
+  const startOfDay = moment().startOf('day').toDate();
+  const endOfDay = moment().endOf('day').toDate();
   const { result, error } = await currenciesStatisticsModel.aggregate([{
     $match: {
       $and: [{ createdAt: { $gt: startOfDay } }, { createdAt: { $lt: endOfDay } }],
