@@ -1,4 +1,4 @@
-const { currencyOperations } = require('utilities/operations');
+const { currencyOperations, reservationCurrency } = require('utilities/operations');
 const validators = require('controllers/validators');
 
 const show = async (req, res, next) => {
@@ -10,7 +10,13 @@ const show = async (req, res, next) => {
   if (!value) return;
   const { result, error } = await currencyOperations.getCurrencies(value);
   if (error) return next(error);
-  res.result = { status: 200, json: result };
-  next();
+  res.status(200).json(result);
 };
-module.exports = { show };
+
+const currenciesForReserve = async (req, res, next) => {
+  const { hiveCurrency, id, error } = await reservationCurrency.getAndSaveCurrency();
+  if (error) return next(error);
+  res.status(200).json({ hiveCurrency, id });
+};
+
+module.exports = { show, currenciesForReserve };

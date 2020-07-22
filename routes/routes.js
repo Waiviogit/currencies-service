@@ -7,4 +7,7 @@ currencyRoute.use('/currencies-api', currencyRoute);
 currencyRoute.route('/marketInfo')
   .get(currencyController.show);
 
+currencyRoute.route('/marketInfo')
+  .get(currencyController.show);
+
 module.exports = currencyRoute;

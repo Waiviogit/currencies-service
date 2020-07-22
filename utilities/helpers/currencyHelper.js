@@ -1,7 +1,7 @@
 const axios = require('axios');
 const _ = require('lodash');
 const moment = require('moment');
-const { currenciesStatisticsModel } = require('models');
+const { currenciesStatisticsModel, reservationCurrenciesModel } = require('models');
 const { serviceData } = require('constants/index');
 
 const getCurrentCurrencies = async (data) => {
@@ -103,7 +103,20 @@ const getDailyCurrency = async () => {
   if (currencies) console.log(`Daily currencies successfully save at ${new Date()}`);
 };
 
+const getCurrencyForReservation = async (data) => {
+  const { result: currentCurrency } = await getCurrentCurrencies(data);
+  const { currencies, error } = await reservationCurrenciesModel.create(
+    { hiveCurrency: _.get(currentCurrency, 'hive.usd') },
+  );
+  if (error) return { error };
+  return {
+    hiveCurrency: _.get(currentCurrency, 'hive.usd'),
+    id: currencies._id,
+  };
+};
+
 module.exports = {
+  getCurrencyForReservation,
   getCurrentCurrencies,
   getWeaklyCurrencies,
   collectStatistics,
