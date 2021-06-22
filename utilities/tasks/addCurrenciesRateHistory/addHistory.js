@@ -23,6 +23,7 @@ module.exports = async ({ date, base, symbols }) => {
       params: {
         start_date, end_date, base, symbols,
       },
+      callback: CURRENCY_RATE_API.CALLBACK,
     });
     if (error) return console.error(start_date, error);
 

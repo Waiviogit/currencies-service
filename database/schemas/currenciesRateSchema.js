@@ -2,12 +2,10 @@ const { BASE_CURRENCIES, RATE_CURRENCIES, SUPPORTED_CURRENCIES } = require('cons
 const mongoose = require('mongoose');
 const _ = require('lodash');
 
-const { Schema } = mongoose;
-
 const rate = () => _.reduce(
   RATE_CURRENCIES,
   (acc, el) => {
-    acc.rates[el] = { type: mongoose.Types.Decimal128, required: true };
+    acc.rates[el] = { type: Number, required: true };
     return acc;
   },
   {
@@ -16,7 +14,7 @@ const rate = () => _.reduce(
     rates: {},
   },
 );
-const CurrenciesRateSchema = new Schema(rate(), {versionKey: false});
+const CurrenciesRateSchema = new mongoose.Schema(rate(), { versionKey: false });
 
 CurrenciesRateSchema.index({ base: 1, dateString: -1 }, { unique: true });
 

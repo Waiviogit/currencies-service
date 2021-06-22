@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 exports.allowedIds = ['hive', 'hive_dollar'];
 exports.allowedCurrencies = ['usd', 'btc'];
 
@@ -18,4 +20,5 @@ exports.CURRENCY_RATE_API = {
   HOST: 'https://api.exchangerate.host',
   LATEST: '/latest',
   TIME_SERIES: '/timeseries',
+  CALLBACK: (value) => _.get(value, 'data.rates'),
 };

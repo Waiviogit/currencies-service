@@ -13,3 +13,13 @@ exports.updateOne = async (filter, updateData) => {
     return { error };
   }
 };
+
+exports.findOne = async ({ condition, select, sort }) => {
+  try {
+    return {
+      result: await CurrenciesRateSchema.findOne(condition, select).sort(sort).lean(),
+    };
+  } catch (error) {
+    return { error };
+  }
+};

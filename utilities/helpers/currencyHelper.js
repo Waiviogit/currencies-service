@@ -122,6 +122,7 @@ const getDailyCurrenciesRate = async () => {
     const { rates, error } = await rateApiHelper.getRates({
       url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.LATEST}`,
       params: { base, symbols: RATE_CURRENCIES.join(',') },
+      callback: CURRENCY_RATE_API.CALLBACK,
     });
     if (error || !rates) return console.error(error.message || 'Something wrong with request');
 
