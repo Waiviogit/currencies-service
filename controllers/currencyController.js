@@ -28,7 +28,7 @@ const currencyRateLatest = async (req, res, next) => {
   );
   const { rates, error } = await currencyRates.getCurrencyRatesLatest(value);
   if (error) return next(error);
-  res.status(200).json({ rates });
+  res.status(200).json(rates);
 };
 
 module.exports = { show, currenciesForReserve, currencyRateLatest };
