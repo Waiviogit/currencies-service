@@ -69,7 +69,7 @@
         }
       }
     },
-    "/currencies-api/currency-rate/latest" : {
+    "/currencies-api/rate/latest" : {
       "get" : {
         "tags" : [ "rate" ],
         "summary" : "Get data about latest rate supported currencies",
