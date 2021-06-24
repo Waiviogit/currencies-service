@@ -10,3 +10,8 @@ exports.dailyStatisticsJob = new CronJob('13 0 */1 * *', async () => {
   // add new currency statistic every 1 day
   await currencyHelper.getDailyCurrency();
 }, null, true, null, null, false);
+
+exports.dailyCurrencyRateJob = new CronJob('00 17 */1 * *', async () => {
+  // add new currency rate statistic every 1 day
+  await currencyHelper.getDailyCurrenciesRate();
+}, null, true, null, null, false);

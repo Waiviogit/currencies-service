@@ -15,6 +15,7 @@ mongoose.set('debug', process.env.NODE_ENV === 'development');
 module.exports = {
   Mongoose: mongoose,
   models: {
+    CurrenciesRateSchema: require('./schemas/currenciesRateSchema'),
     CurrenciesSchema: require('./schemas/currenciesStatisticSchema'),
     ReservationCurrenciesSchema: require('./schemas/reservationCurrenciesSchema'),
   },

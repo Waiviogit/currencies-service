@@ -1,8 +1,10 @@
+const { currenciesStatisticsModel, reservationCurrenciesModel, currenciesRateModel } = require('models');
+const { BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API } = require('constants/serviceData');
+const rateApiHelper = require('utilities/helpers/rateApiHelper');
+const { serviceData } = require('constants/index');
+const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
-const moment = require('moment');
-const { currenciesStatisticsModel, reservationCurrenciesModel } = require('models');
-const { serviceData } = require('constants/index');
 
 const getCurrentCurrencies = async (data) => {
   const { result } = await getCurrenciesFromRequest(data);
@@ -115,8 +117,29 @@ const getCurrencyForReservation = async (data) => {
   };
 };
 
+const getDailyCurrenciesRate = async () => {
+  for (const base of BASE_CURRENCIES) {
+    const { rates, error } = await rateApiHelper.getRates({
+      url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.LATEST}`,
+      params: { base, symbols: RATE_CURRENCIES.join(',') },
+      callback: CURRENCY_RATE_API.CALLBACK,
+    });
+    if (error || !rates) return console.error(error.message || 'Something wrong with request');
+
+    const updateData = _.reduce(rates, (acc, el, index) => {
+      acc[`rates.${index}`] = el;
+      return acc;
+    }, {});
+    const currentDate = () => moment().format('YYYY-MM-DD');
+    const { result } = await currenciesRateModel
+      .updateOne({ base, dateString: currentDate() }, updateData);
+    if (result) console.log(`Currencies rate successfully save at ${moment().format()}`);
+  }
+};
+
 module.exports = {
   getCurrencyForReservation,
+  getDailyCurrenciesRate,
   getCurrentCurrencies,
   getWeaklyCurrencies,
   collectStatistics,

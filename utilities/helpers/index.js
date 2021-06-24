@@ -1,4 +1,4 @@
-
 module.exports = {
-  currencyHelper: require('./currencyHelper')
+  currencyHelper: require('./currencyHelper'),
+  rateApiHelper: require('./rateApiHelper'),
 };

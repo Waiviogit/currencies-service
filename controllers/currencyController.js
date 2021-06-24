@@ -1,5 +1,6 @@
-const { currencyOperations, reservationCurrency } = require('utilities/operations');
+const { currencyOperations, reservationCurrency, currencyRates } = require('utilities/operations');
 const validators = require('controllers/validators');
+const _ = require('lodash');
 
 const show = async (req, res, next) => {
   const value = validators.validate({
@@ -19,4 +20,15 @@ const currenciesForReserve = async (req, res, next) => {
   res.status(200).json({ hiveCurrency, id });
 };
 
-module.exports = { show, currenciesForReserve };
+const currencyRateLatest = async (req, res, next) => {
+  const value = validators.validate(
+    { base: req.query.base, symbols: _.split(req.query.symbols, ',') },
+    validators.currency.currencyRateLatestSchema,
+    next,
+  );
+  const { rates, error } = await currencyRates.getCurrencyRatesLatest(value);
+  if (error) return next(error);
+  res.status(200).json(rates);
+};
+
+module.exports = { show, currenciesForReserve, currencyRateLatest };

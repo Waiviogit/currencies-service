@@ -10,4 +10,7 @@ currencyRoute.route('/marketInfo')
 currencyRoute.route('/reservationCurrency')
   .get(currencyController.currenciesForReserve);
 
+currencyRoute.route('/rate/latest')
+  .get(currencyController.currencyRateLatest);
+
 module.exports = currencyRoute;
