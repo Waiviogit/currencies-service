@@ -16,7 +16,15 @@ exports.SUPPORTED_CURRENCIES = {
   UAH: 'UAH',
 };
 
+exports.SUPPORTED_HIVE_ENGINE_TOKENS = {
+  WAIV: 'WAIV',
+};
+
 exports.BASE_CURRENCIES = [
+  this.SUPPORTED_CURRENCIES.USD,
+];
+
+exports.BASE_CURRENCIES_HIVE_ENGINE = [
   this.SUPPORTED_CURRENCIES.USD,
 ];
 
@@ -32,9 +40,16 @@ exports.RATE_CURRENCIES = [
   this.SUPPORTED_CURRENCIES.UAH,
 ];
 
+exports.RATE_HIVE_ENGINE = Object.values(this.SUPPORTED_HIVE_ENGINE_TOKENS);
+
 exports.CURRENCY_RATE_API = {
   HOST: 'https://api.exchangerate.host',
   LATEST: '/latest',
   TIME_SERIES: '/timeseries',
   CALLBACK: (value) => _.get(value, 'data.rates'),
+};
+
+exports.STATISTIC_RECORD_TYPES = {
+  ORDINARY: 'ordinaryData',
+  DAILY: 'dailyData',
 };

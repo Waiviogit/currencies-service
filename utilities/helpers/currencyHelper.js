@@ -1,7 +1,15 @@
-const { currenciesStatisticsModel, reservationCurrenciesModel, currenciesRateModel } = require('models');
-const { BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API } = require('constants/serviceData');
+const {
+  currenciesStatisticsModel,
+  reservationCurrenciesModel,
+  currenciesRateModel,
+  hiveEngineRateModel,
+} = require('models');
+const {
+  BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API, RATE_HIVE_ENGINE, SUPPORTED_CURRENCIES,
+} = require('constants/serviceData');
 const rateApiHelper = require('utilities/helpers/rateApiHelper');
 const { serviceData } = require('constants/index');
+const { marketContract } = require('utilities/hiveEngine');
 const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
@@ -63,6 +71,32 @@ const collectStatistics = async (type, resource) => {
   result.type = type;
   const { currencies } = await currenciesStatisticsModel.create(result);
   if (currencies) console.log(`Currencies successfully save at ${new Date()}`);
+};
+
+const collectEngineStatistics = async (type, resource) => {
+  const { result, error } = await getCurrenciesFromRequest({
+    ids: serviceData.allowedIds,
+    currencies: serviceData.allowedCurrencies,
+    resource,
+  });
+  if (error || !result) {
+    console.error(error.message || 'Something wrong with request');
+  }
+  const { result: engineMetrics, error: engineError } = await marketContract.getMarketMetrics({
+    query: { symbol: { $in: RATE_HIVE_ENGINE } },
+  });
+  if (engineError || _.isEmpty(engineMetrics)) return;
+  const { hive } = result;
+  const rates = _.reduce(engineMetrics, (acc, el) => {
+    acc[`${el.symbol}`] = el.lastPrice * hive.usd;
+    return acc;
+  }, {});
+
+  await hiveEngineRateModel.create({
+    dateString: moment().format('YYYY-MM-DD'),
+    rates,
+    type,
+  });
 };
 
 const getDailyCurrency = async () => {
@@ -137,6 +171,39 @@ const getDailyCurrenciesRate = async () => {
   }
 };
 
+const getDailyHiveEngineRate = async () => {
+  const dateString = moment().subtract(1, 'day').format('YYYY-MM-DD');
+  const { result, error } = await hiveEngineRateModel.aggregate([
+    {
+      $match: {
+        dateString,
+        type: 'ordinaryData',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
+          acc[el] = { $avg: `$rates.${el}` };
+          return acc;
+        }, {}),
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        type: 'dailyData',
+        ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
+          acc[`rates.${el}`] = `$${el}`;
+          return acc;
+        }, {}),
+      },
+    },
+  ]);
+  if (error) return { error };
+  await hiveEngineRateModel.create(result[0]);
+};
+
 module.exports = {
   getCurrencyForReservation,
   getDailyCurrenciesRate,
@@ -144,4 +211,6 @@ module.exports = {
   getWeaklyCurrencies,
   collectStatistics,
   getDailyCurrency,
+  collectEngineStatistics,
+  getDailyHiveEngineRate,
 };
