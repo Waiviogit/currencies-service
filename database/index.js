@@ -18,5 +18,6 @@ module.exports = {
     CurrenciesRateSchema: require('./schemas/currenciesRateSchema'),
     CurrenciesSchema: require('./schemas/currenciesStatisticSchema'),
     ReservationCurrenciesSchema: require('./schemas/reservationCurrenciesSchema'),
+    HiveEngineRateSchema: require('./schemas/hiveEngineRateSchema'),
   },
 };
