@@ -41,6 +41,7 @@ exports.RATE_CURRENCIES = [
 ];
 
 exports.RATE_HIVE_ENGINE = Object.values(this.SUPPORTED_HIVE_ENGINE_TOKENS);
+exports.DIESEL_POOLS_ID = [63];
 
 exports.CURRENCY_RATE_API = {
   HOST: 'https://api.exchangerate.host',

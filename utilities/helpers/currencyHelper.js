@@ -5,11 +5,11 @@ const {
   hiveEngineRateModel,
 } = require('models');
 const {
-  BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API, RATE_HIVE_ENGINE, SUPPORTED_CURRENCIES,
+  BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API, RATE_HIVE_ENGINE, DIESEL_POOLS_ID,
 } = require('constants/serviceData');
 const rateApiHelper = require('utilities/helpers/rateApiHelper');
 const { serviceData } = require('constants/index');
-const { marketContract } = require('utilities/hiveEngine');
+const { marketPools } = require('utilities/hiveEngine');
 const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
@@ -82,13 +82,15 @@ const collectEngineStatistics = async (type, resource) => {
   if (error || !result) {
     console.error(error.message || 'Something wrong with request');
   }
-  const { result: engineMetrics, error: engineError } = await marketContract.getMarketMetrics({
-    query: { symbol: { $in: RATE_HIVE_ENGINE } },
-  });
-  if (engineError || _.isEmpty(engineMetrics)) return;
+
+  const { result: enginePools, error: enginePoolsError } = await marketPools
+    .getMarketPools({ query: { _id: { $in: DIESEL_POOLS_ID } } });
+  if (enginePoolsError || _.isEmpty(enginePools)) return;
   const { hive } = result;
-  const rates = _.reduce(engineMetrics, (acc, el) => {
-    acc[`${el.symbol}`] = el.lastPrice * hive.usd;
+
+  const rates = _.reduce(enginePools, (acc, el) => {
+    const symbol = el.tokenPair.split(':')[1];
+    acc[symbol] = parseFloat(el.quotePrice) * hive.usd;
     return acc;
   }, {});
 
@@ -201,7 +203,7 @@ const getDailyHiveEngineRate = async () => {
     },
   ]);
   if (error) return { error };
-  await hiveEngineRateModel.create(result[0]);
+  await hiveEngineRateModel.create(Object.assign(result[0], { dateString }));
 };
 
 module.exports = {
