@@ -5,7 +5,12 @@ const {
   hiveEngineRateModel,
 } = require('models');
 const {
-  BASE_CURRENCIES, RATE_CURRENCIES, CURRENCY_RATE_API, RATE_HIVE_ENGINE, DIESEL_POOLS_ID,
+  BASE_CURRENCIES_HIVE_ENGINE,
+  CURRENCY_RATE_API,
+  RATE_HIVE_ENGINE,
+  BASE_CURRENCIES,
+  RATE_CURRENCIES,
+  DIESEL_POOLS_ID,
 } = require('constants/serviceData');
 const rateApiHelper = require('utilities/helpers/rateApiHelper');
 const { serviceData } = require('constants/index');
@@ -81,6 +86,7 @@ const collectEngineStatistics = async (type, resource) => {
   });
   if (error || !result) {
     console.error(error.message || 'Something wrong with request');
+    return;
   }
 
   const { result: enginePools, error: enginePoolsError } = await marketPools
@@ -88,17 +94,20 @@ const collectEngineStatistics = async (type, resource) => {
   if (enginePoolsError || _.isEmpty(enginePools)) return;
   const { hive } = result;
 
-  const rates = _.reduce(enginePools, (acc, el) => {
-    const symbol = el.tokenPair.split(':')[1];
-    acc[symbol] = parseFloat(el.quotePrice) * hive.usd;
-    return acc;
-  }, {});
+  for (const enginePool of enginePools) {
+    const base = enginePool.tokenPair.split(':')[1];
+    const rates = {
+      HIVE: parseFloat(enginePool.quotePrice),
+      USD: parseFloat(enginePool.quotePrice) * hive.usd,
+    };
 
-  await hiveEngineRateModel.create({
-    dateString: moment().format('YYYY-MM-DD'),
-    rates,
-    type,
-  });
+    await hiveEngineRateModel.create({
+      dateString: moment().format('YYYY-MM-DD'),
+      base,
+      rates,
+      type,
+    });
+  }
 };
 
 const getDailyCurrency = async () => {
@@ -175,35 +184,38 @@ const getDailyCurrenciesRate = async () => {
 
 const getDailyHiveEngineRate = async () => {
   const dateString = moment().subtract(1, 'day').format('YYYY-MM-DD');
-  const { result, error } = await hiveEngineRateModel.aggregate([
-    {
-      $match: {
-        dateString,
-        type: 'ordinaryData',
+  for (const base of BASE_CURRENCIES_HIVE_ENGINE) {
+    const { result, error } = await hiveEngineRateModel.aggregate([
+      {
+        $match: {
+          base,
+          type: 'ordinaryData',
+          dateString,
+        },
       },
-    },
-    {
-      $group: {
-        _id: null,
-        ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
-          acc[el] = { $avg: `$rates.${el}` };
-          return acc;
-        }, {}),
+      {
+        $group: {
+          _id: null,
+          ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
+            acc[el] = { $avg: `$rates.${el}` };
+            return acc;
+          }, {}),
+        },
       },
-    },
-    {
-      $project: {
-        _id: 0,
-        type: 'dailyData',
-        ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
-          acc[`rates.${el}`] = `$${el}`;
-          return acc;
-        }, {}),
+      {
+        $project: {
+          _id: 0,
+          type: 'dailyData',
+          ..._.reduce(RATE_HIVE_ENGINE, (acc, el) => {
+            acc[`rates.${el}`] = `$${el}`;
+            return acc;
+          }, {}),
+        },
       },
-    },
-  ]);
-  if (error) return { error };
-  await hiveEngineRateModel.create(Object.assign(result[0], { dateString }));
+    ]);
+    if (error) return { error };
+    await hiveEngineRateModel.create(Object.assign(result[0], { dateString }));
+  }
 };
 
 module.exports = {
