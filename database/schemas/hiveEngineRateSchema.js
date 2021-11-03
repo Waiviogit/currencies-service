@@ -1,5 +1,8 @@
 const {
-  BASE_CURRENCIES_HIVE_ENGINE, RATE_HIVE_ENGINE, SUPPORTED_CURRENCIES, STATISTIC_RECORD_TYPES,
+  BASE_CURRENCIES_HIVE_ENGINE,
+  SUPPORTED_HIVE_ENGINE_TOKENS,
+  STATISTIC_RECORD_TYPES,
+  RATE_HIVE_ENGINE,
 } = require('constants/serviceData');
 const mongoose = require('mongoose');
 const _ = require('lodash');
@@ -13,7 +16,7 @@ const rates = () => _.reduce(
   {
     dateString: { type: String, index: true },
     base: {
-      type: String, default: SUPPORTED_CURRENCIES.USD, valid: BASE_CURRENCIES_HIVE_ENGINE,
+      type: String, default: SUPPORTED_HIVE_ENGINE_TOKENS.WAIV, valid: BASE_CURRENCIES_HIVE_ENGINE,
     },
     type: {
       type: String,
