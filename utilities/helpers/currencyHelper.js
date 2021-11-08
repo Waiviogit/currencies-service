@@ -10,7 +10,7 @@ const {
   RATE_HIVE_ENGINE,
   BASE_CURRENCIES,
   RATE_CURRENCIES,
-  DIESEL_POOLS_ID,
+  DIESEL_POOLS,
 } = require('constants/serviceData');
 const rateApiHelper = require('utilities/helpers/rateApiHelper');
 const { serviceData } = require('constants/index');
@@ -78,6 +78,15 @@ const collectStatistics = async (type, resource) => {
   if (currencies) console.log(`Currencies successfully save at ${new Date()}`);
 };
 
+const getEngineCurrentPriceFromDieselPool = async (_id) => {
+  const { result: enginePools, error: enginePoolsError } = await marketPools
+    .getMarketPools({ query: { _id } });
+  if (enginePoolsError || _.isEmpty(enginePools)) return 0;
+
+  const { quotePrice } = enginePools[0];
+  return parseFloat(quotePrice);
+};
+
 const collectEngineStatistics = async (type, resource) => {
   const { result, error } = await getCurrenciesFromRequest({
     ids: serviceData.allowedIds,
@@ -90,12 +99,12 @@ const collectEngineStatistics = async (type, resource) => {
   }
 
   const { result: enginePools, error: enginePoolsError } = await marketPools
-    .getMarketPools({ query: { _id: { $in: DIESEL_POOLS_ID } } });
+    .getMarketPools({ query: { _id: { $in: _.map(DIESEL_POOLS, 'dieselPoolId') } } });
   if (enginePoolsError || _.isEmpty(enginePools)) return;
   const { hive } = result;
 
   for (const enginePool of enginePools) {
-    const base = enginePool.tokenPair.split(':')[1];
+    const { base } = _.find(DIESEL_POOLS, (pool) => pool.dieselPoolId === enginePool._id);
     const rates = {
       HIVE: parseFloat(enginePool.quotePrice),
       USD: parseFloat(enginePool.quotePrice) * hive.usd,
@@ -183,8 +192,11 @@ const getDailyCurrenciesRate = async () => {
 };
 
 const getDailyHiveEngineRate = async () => {
-  const dateString = moment().subtract(1, 'day').format('YYYY-MM-DD');
+  const dateString = moment.utc().subtract(1, 'day').format('YYYY-MM-DD');
+  const compareDate = moment.utc().subtract(2, 'day').format('YYYY-MM-DD');
   for (const base of BASE_CURRENCIES_HIVE_ENGINE) {
+    const { result: previous } = await hiveEngineRateModel
+      .findOne({ condition: { base, dateString: compareDate, type: 'dailyData' } });
     const { result, error } = await hiveEngineRateModel.aggregate([
       {
         $match: {
@@ -213,10 +225,27 @@ const getDailyHiveEngineRate = async () => {
         },
       },
     ]);
+    const change24h = getEngine24hChange({
+      current: _.get(result, '[0].rates'),
+      previous: _.get(previous, 'rates'),
+    });
+
     if (error) return { error };
-    await hiveEngineRateModel.create(Object.assign(result[0], { dateString }));
+    const saveData = Object.assign(
+      result[0],
+      { dateString, change24h },
+
+    );
+    await hiveEngineRateModel.create(saveData);
   }
 };
+
+const getEngine24hChange = ({ previous, current }) => _.reduce(RATE_HIVE_ENGINE, (acc, el) => {
+  const rates1 = _.get(previous, el, 0);
+  const rates2 = _.get(current, el, 0);
+  acc[el] = ((rates2 - rates1) / rates1) * 100;
+  return acc;
+}, {});
 
 module.exports = {
   getCurrencyForReservation,
@@ -227,4 +256,6 @@ module.exports = {
   getDailyCurrency,
   collectEngineStatistics,
   getDailyHiveEngineRate,
+  getEngineCurrentPriceFromDieselPool,
+  getEngine24hChange,
 };

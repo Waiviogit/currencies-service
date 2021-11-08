@@ -16,3 +16,34 @@ exports.aggregate = async (pipeline) => {
     return { error };
   }
 };
+
+exports.find = async ({
+  condition, projection, sort = {}, limit, skip = 0,
+}) => {
+  try {
+    return {
+      result: await HiveEngineRateSchema
+        .find(condition, projection)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    };
+  } catch (error) {
+    return { error };
+  }
+};
+
+exports.findOne = async ({
+  condition, projection,
+}) => {
+  try {
+    return {
+      result: await HiveEngineRateSchema
+        .findOne(condition, projection)
+        .lean(),
+    };
+  } catch (error) {
+    return { error };
+  }
+};

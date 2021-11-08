@@ -49,7 +49,14 @@ exports.RATE_HIVE_ENGINE = [
   this.SUPPORTED_CURRENCIES.USD,
 ];
 
-exports.DIESEL_POOLS_ID = [63];
+exports.SWAP_HIVE_WAIV = {
+  base: 'WAIV',
+  dieselPoolId: 63,
+};
+
+exports.DIESEL_POOLS = [
+  this.SWAP_HIVE_WAIV,
+];
 
 exports.CURRENCY_RATE_API = {
   HOST: 'https://api.exchangerate.host',

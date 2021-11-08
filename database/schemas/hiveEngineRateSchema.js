@@ -11,6 +11,7 @@ const rates = () => _.reduce(
   RATE_HIVE_ENGINE,
   (acc, el) => {
     acc.rates[el] = { type: Number, required: true };
+    acc.change24h[el] = { type: Number };
     return acc;
   },
   {
@@ -25,6 +26,7 @@ const rates = () => _.reduce(
       index: true,
     },
     rates: {},
+    change24h: {},
   },
 );
 const HiveEngineRateSchema = new mongoose.Schema(rates(), { versionKey: false });
