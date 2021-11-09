@@ -7,6 +7,9 @@ currencyRoute.use('/currencies-api', currencyRoute);
 currencyRoute.route('/marketInfo')
   .get(currencyController.show);
 
+currencyRoute.route('/engine-rates')
+  .get(currencyController.engineCurrencies);
+
 currencyRoute.route('/reservationCurrency')
   .get(currencyController.currenciesForReserve);
 

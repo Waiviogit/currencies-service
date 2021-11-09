@@ -1,4 +1,6 @@
-const { currencyOperations, reservationCurrency, currencyRates } = require('utilities/operations');
+const {
+  currencyOperations, reservationCurrency, currencyRates, engineRates,
+} = require('utilities/operations');
 const validators = require('controllers/validators');
 const _ = require('lodash');
 
@@ -31,4 +33,18 @@ const currencyRateLatest = async (req, res, next) => {
   res.status(200).json(rates);
 };
 
-module.exports = { show, currenciesForReserve, currencyRateLatest };
+const engineCurrencies = async (req, res, next) => {
+  const value = validators.validate(
+    req.query,
+    validators.currency.engineRatesSchema,
+    next,
+  );
+  if (!value) return;
+  const { current, weekly, error } = await engineRates.getEngineRates(value);
+  if (error) return next(error);
+  res.status(200).json({ current, weekly });
+};
+
+module.exports = {
+  show, currenciesForReserve, currencyRateLatest, engineCurrencies,
+};

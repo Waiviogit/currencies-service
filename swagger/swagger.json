@@ -24,6 +24,30 @@
     "http"
   ],
   "paths" : {
+    "/currencies-api/engine-rates" : {
+      "get" : {
+        "tags" : [ "market" ],
+        "summary" : "Get data about currencies",
+        "description" : "Return data on the current state of currencies and data on the state of the currency for the previous 7 days",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "base",
+          "in" : "query",
+          "description" : "base hive-engine currency",
+          "required" : true,
+          "type" : "string",
+          "enum": ["WAIV"]
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/engine_rate_response"
+            }
+          }
+        }
+      }
+    },
     "/currencies-api/marketInfo" : {
       "get" : {
         "tags" : [ "market" ],
@@ -102,6 +126,53 @@
     }
   },
   "definitions" : {
+    "engine_rate": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "string"
+        },
+        "rates" : {
+          "type": "object",
+          "properties": {
+            "HIVE": {
+              "type": "number"
+            },
+            "USD": {
+              "type": "number"
+            }
+          }
+        },
+        "change24h" : {
+          "type": "object",
+          "properties": {
+            "HIVE": {
+              "type": "number"
+            },
+            "USD": {
+              "type": "number"
+            }
+          }
+        },
+        "dateString": {
+          "type": "string"
+        }
+      }
+    },
+    "engine_rate_response": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "$ref" : "#/definitions/engine_rate"
+        },
+        "weekly": {
+          "type": "array",
+          "items": {
+            "$ref" : "#/definitions/engine_rate"
+          }
+        }
+      }
+    },
     "currency_rate_latest_response": {
       "type": "object",
       "example": {
