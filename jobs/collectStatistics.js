@@ -21,7 +21,7 @@ exports.ordinaryEngineStatisticsJob = new CronJob('*/5 * * * *', async () => {
   await currencyHelper.collectEngineStatistics('ordinaryData', 'coingecko');
 }, null, true, null, null, false);
 
-exports.dailyHiveEngineRateJob = new CronJob('00 20 */1 * *', async () => {
+exports.dailyHiveEngineRateJob = new CronJob('20 00 */1 * *', async () => {
   // add new currency rate statistic every 1 day
   await currencyHelper.getDailyHiveEngineRate();
 }, null, true, null, null, false);
