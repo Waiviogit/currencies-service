@@ -10,6 +10,9 @@ currencyRoute.route('/marketInfo')
 currencyRoute.route('/engine-rates')
   .get(currencyController.engineCurrencies);
 
+currencyRoute.route('/engine-current')
+  .get(currencyController.engineCurrent);
+
 currencyRoute.route('/reservationCurrency')
   .get(currencyController.currenciesForReserve);
 

@@ -24,6 +24,30 @@
     "http"
   ],
   "paths" : {
+    "/currencies-api/engine-current" : {
+      "get" : {
+        "tags" : [ "market" ],
+        "summary" : "Get data about currencies",
+        "description" : "Return data on the current price of token in USD/HIVE",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "description" : "hive-engine currency",
+          "required" : true,
+          "type" : "string",
+          "enum": ["WAIV"]
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/engine_current_response"
+            }
+          }
+        }
+      }
+    },
     "/currencies-api/engine-rates" : {
       "get" : {
         "tags" : [ "market" ],
@@ -170,6 +194,17 @@
           "items": {
             "$ref" : "#/definitions/engine_rate"
           }
+        }
+      }
+    },
+    "engine_current_response": {
+      "type": "object",
+      "properties": {
+        "HIVE": {
+          "type": "number"
+        },
+        "USD": {
+          "type": "number"
         }
       }
     },
