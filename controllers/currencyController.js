@@ -45,6 +45,18 @@ const engineCurrencies = async (req, res, next) => {
   res.status(200).json({ current, weekly });
 };
 
+const engineCurrent = async (req, res, next) => {
+  const value = validators.validate(
+    req.query,
+    validators.currency.engineCurrentSchema,
+    next,
+  );
+  if (!value) return;
+  const { HIVE, USD, error } = await engineRates.getEngineCurrent(value);
+  if (error) return next(error);
+  res.status(200).json({ HIVE, USD });
+};
+
 module.exports = {
-  show, currenciesForReserve, currencyRateLatest, engineCurrencies,
+  show, currenciesForReserve, currencyRateLatest, engineCurrencies, engineCurrent,
 };

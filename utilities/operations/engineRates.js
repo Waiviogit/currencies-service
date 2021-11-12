@@ -18,6 +18,14 @@ exports.getEngineRates = async ({ base }) => {
   return { current, weekly };
 };
 
+exports.getEngineCurrent = async ({ token }) => {
+  const current = await getCurrent({ base: token });
+  if (_.has(current, 'error')) return { error: new Error('bad request') };
+  const { rates: { HIVE, USD } } = current;
+
+  return { HIVE, USD };
+};
+
 const getCurrent = async ({ base }) => {
   const dieselPool = _.find(DIESEL_POOLS, (pool) => pool.base === base);
 

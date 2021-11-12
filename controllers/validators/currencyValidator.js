@@ -30,3 +30,7 @@ exports.currencyRateLatestSchema = Joi.object().keys({
 exports.engineRatesSchema = Joi.object().keys({
   base: Joi.string().valid(...BASE_CURRENCIES_HIVE_ENGINE).required(),
 });
+
+exports.engineCurrentSchema = Joi.object().keys({
+  token: Joi.string().valid(...BASE_CURRENCIES_HIVE_ENGINE).required(),
+});
