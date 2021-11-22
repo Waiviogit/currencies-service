@@ -14,6 +14,7 @@ exports.getEngineRates = async ({ base }) => {
   current.change24h = currencyHelper.getEngine24hChange({
     current: _.get(current, 'rates'), previous: _.get(weekly, '[0].rates'),
   });
+  weekly.unshift(current);
 
   return { current, weekly };
 };
@@ -38,14 +39,21 @@ const getCurrent = async ({ base }) => {
     resource: 'coingecko',
   });
   if (error) return { error };
-  return { base, rates: { HIVE: priceInHive, USD: priceInHive * result.hive.usd } };
+  return {
+    base,
+    dateString: moment().format('YYYY-MM-DD'),
+    rates: {
+      HIVE: priceInHive,
+      USD: priceInHive * result.hive.usd,
+    },
+  };
 };
 
 const getWeekly = async ({ base }) => {
-  const sevenDaysAgo = moment().subtract(7, 'days').format('YYYY-MM-DD');
+  const sixDaysAgo = moment().subtract(6, 'days').format('YYYY-MM-DD');
 
   const { result } = await hiveEngineRateModel.find({
-    condition: { base, type: 'dailyData', dateString: { $gte: sevenDaysAgo } },
+    condition: { base, type: 'dailyData', dateString: { $gte: sixDaysAgo } },
     projection: { _id: 0, type: 0 },
     sort: { dateString: -1 },
   });
