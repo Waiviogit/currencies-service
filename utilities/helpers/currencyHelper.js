@@ -59,7 +59,17 @@ const getWeaklyCurrencies = async (currentCurrency) => {
       limit: 7,
     },
   );
-  weeklyCurrencies[0] = currentCurrency;
+
+  const hasCurrentDate = _.includes(
+    _.map(weeklyCurrencies,
+      (currency) => moment(currency.createdAt).format('D')),
+    moment(currentCurrency.createdAt).format('D'),
+  );
+  if (hasCurrentDate) return weeklyCurrencies;
+
+  weeklyCurrencies.pop();
+  weeklyCurrencies.unshift(currentCurrency);
+
   return weeklyCurrencies;
 };
 
