@@ -129,9 +129,9 @@ const collectEngineStatistics = async (type, resource) => {
   }
 };
 
-const getDailyCurrency = async () => {
-  const startOfDay = moment().startOf('day').toDate();
-  const endOfDay = moment().endOf('day').toDate();
+const getDailyCurrency = async (date) => {
+  const startOfDay = moment(date).startOf('day').toDate();
+  const endOfDay = moment(date).endOf('day').toDate();
   const { result, error } = await currenciesStatisticsModel.aggregate([{
     $match: {
       $and: [{ createdAt: { $gt: startOfDay } }, { createdAt: { $lt: endOfDay } }],
