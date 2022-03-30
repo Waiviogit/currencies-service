@@ -18,6 +18,7 @@ const { marketPools } = require('utilities/hiveEngine');
 const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
+const { ObjectId } = require('mongoose').Types;
 
 const getCurrentCurrencies = async (data) => {
   const { result } = await getCurrenciesFromRequest(data);
@@ -165,8 +166,13 @@ const getDailyCurrency = async (date) => {
   },
   ]);
   if (error) return { error };
-  const { currencies } = await currenciesStatisticsModel.create(result[0]);
-  if (currencies) console.log(`Daily currencies successfully save at ${new Date()}`);
+  const [dataToSave] = result;
+  if (date) {
+    dataToSave.createdAt = moment.utc(date).format();
+    dataToSave._id = new ObjectId(moment.utc(date).unix());
+  }
+  const { currencies } = await currenciesStatisticsModel.create(dataToSave);
+  if (currencies) console.log(`Daily currencies successfully save at ${date || new Date()}`);
 };
 
 const getCurrencyForReservation = async (data) => {
