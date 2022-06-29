@@ -8,6 +8,7 @@ const _ = require('lodash');
 
 module.exports = async ({ date }) => {
   const missingDate = moment(date).format('YYYY-MM-DD');
+  console.log('Possible hive engine rates missing rate', missingDate);
   const base = 'USD';
   const { rates, error } = await rateApiHelper.getRates({
     url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.TIME_SERIES}`,

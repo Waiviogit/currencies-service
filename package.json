@@ -7,7 +7,8 @@
     "test": "NODE_PATH=. NODE_ENV=test nyc --reporter=html mocha",
     "addCurrenciesRateHistory": "NODE_PATH=. node ./utilities/tasks/addCurrenciesRateHistory/run.js",
     "addMissingDateRates": "NODE_PATH=. node ./utilities/tasks/addMissingDateRates/run.js",
-    "addHiveMissingRates": "NODE_PATH=. node ./utilities/tasks/addHiveMissingRates/run.js"
+    "addHiveMissingRates": "NODE_PATH=. node ./utilities/tasks/addHiveMissingRates/run.js",
+    "addMissingCurrenciesRatePeriod": "NODE_PATH=. node utilities/tasks/addMissingCurrenciesRatePeriod/run.js"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",

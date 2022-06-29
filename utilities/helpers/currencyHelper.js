@@ -18,6 +18,7 @@ const { marketPools } = require('utilities/hiveEngine');
 const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
+const { checkCurrenciesRatePeriod } = require('../tasks/addMissingCurrenciesRatePeriod/checkCurrenciesRatePeriod');
 const { ObjectId } = require('mongoose').Types;
 
 const getCurrentCurrencies = async (data) => {
@@ -263,6 +264,12 @@ const getEngine24hChange = ({ previous, current }) => _.reduce(RATE_HIVE_ENGINE,
   return acc;
 }, {});
 
+const getPeriodDates = async () => {
+  const previousMonthStart = moment.utc().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
+  const previousMonthEnd = moment.utc().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
+  await checkCurrenciesRatePeriod(previousMonthStart, previousMonthEnd);
+};
+
 module.exports = {
   getCurrencyForReservation,
   getDailyCurrenciesRate,
@@ -274,4 +281,5 @@ module.exports = {
   getDailyHiveEngineRate,
   getEngineCurrentPriceFromDieselPool,
   getEngine24hChange,
+  getPeriodDates,
 };
