@@ -18,21 +18,25 @@ exports.checkCurrenciesRatePeriod = async (startDate, endDate) => {
   }
 
   const missingDates = getMissingDates(result.map((el) => moment(el.dateString)));
-  if (!missingDates.length) return;
+  if (!missingDates.length) {
+    console.log('task completed!');
+
+    return;
+  }
 
   for (const date of missingDates) await addRatesByDate({ date });
 };
 
 const getMissingDates = (data) => {
+  const missingDates = [];
   for (let count = 0; count < data.length - 1; count++) {
     const dayDifference = Math.abs(data[count].diff(data[count + 1], 'days'));
     if (dayDifference > 1) {
-      const missingDates = collectDatesWithDifference(dayDifference, data[count]);
-      if (missingDates.length) return missingDates;
+      missingDates.push(...collectDatesWithDifference(dayDifference, data[count]));
     }
   }
 
-  return [];
+  return missingDates;
 };
 
 const collectDatesWithDifference = (dayDifference, date) => {
