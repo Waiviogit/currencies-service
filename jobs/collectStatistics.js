@@ -34,7 +34,7 @@ exports.dailyHiveEngineRateJob = new CronJob('20 00 */1 * *', async () => {
   await currencyHelper.getDailyHiveEngineRate();
 }, null, true, null, null, false);
 
-exports.checkCurrenciesRateForPreviousMonth = new CronJob('* * * * *', async () => {
+exports.checkCurrenciesRateForPreviousMonth = new CronJob('0 0 1 * *', async () => {
   // check currencies rates previous month if there was missing data and collecting missing data
   await getPeriodDates();
 }, null, true, null, null, false);
