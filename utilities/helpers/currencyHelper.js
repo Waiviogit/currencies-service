@@ -18,7 +18,6 @@ const { marketPools } = require('utilities/hiveEngine');
 const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
-const { checkCurrenciesRatePeriod } = require('../tasks/addMissingCurrenciesRatePeriod/checkCurrenciesRatePeriod');
 const { ObjectId } = require('mongoose').Types;
 
 const getCurrentCurrencies = async (data) => {
@@ -34,6 +33,8 @@ const getUrlFromRequestData = (data) => {
   switch (data.resource) {
     case 'coingecko':
       return `https://api.coingecko.com/api/v3/simple/price?ids=${data.ids.toString()}&vs_currencies=${data.currencies.toString()}&include_24hr_change=true`;
+    case 'history':
+      return `https://api.coingecko.com/api/v3/coins/${data.id}/history?date=${data.date}&localization=false`;
     default:
       return '';
   }
@@ -208,9 +209,11 @@ const getDailyCurrenciesRate = async () => {
   }
 };
 
-const getDailyHiveEngineRate = async () => {
-  const dateString = moment.utc().subtract(1, 'day').format('YYYY-MM-DD');
-  const compareDate = moment.utc().subtract(2, 'day').format('YYYY-MM-DD');
+const getDailyHiveEngineRate = async (date) => {
+  const dateString = date ? moment.utc(date).format('YYYY-MM-DD')
+    : moment.utc().subtract(1, 'day').format('YYYY-MM-DD');
+  const compareDate = date ? moment.utc(date).subtract(1, 'day').format('YYYY-MM-DD')
+    : moment.utc().subtract(2, 'day').format('YYYY-MM-DD');
   for (const base of BASE_CURRENCIES_HIVE_ENGINE) {
     const { result: previous } = await hiveEngineRateModel
       .findOne({ condition: { base, dateString: compareDate, type: 'dailyData' } });
@@ -264,12 +267,6 @@ const getEngine24hChange = ({ previous, current }) => _.reduce(RATE_HIVE_ENGINE,
   return acc;
 }, {});
 
-const getPeriodDates = async () => {
-  const previousMonthStart = moment.utc().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
-  const previousMonthEnd = moment.utc().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
-  await checkCurrenciesRatePeriod(previousMonthStart, previousMonthEnd);
-};
-
 module.exports = {
   getCurrencyForReservation,
   getDailyCurrenciesRate,
@@ -281,5 +278,5 @@ module.exports = {
   getDailyHiveEngineRate,
   getEngineCurrentPriceFromDieselPool,
   getEngine24hChange,
-  getPeriodDates,
+  getCurrenciesFromRequest,
 };
