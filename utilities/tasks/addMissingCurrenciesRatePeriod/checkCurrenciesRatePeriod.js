@@ -177,25 +177,14 @@ const checkHiveEngineRates = async (startDate, endDate) => {
 const calculateAverageHiveEngineRate = async (dates) => {
   const data = [];
   for (let count = 0; count < dates.length; count++) {
-    console.log('date', dates[count]);
-    const previousDay = moment(dates[count]).subtract(1, 'day')
-      .format('YYYY-MM-DD');
-    let nextDay;
-    if (dates.length > 1) {
-      nextDay = moment(dates[count + 1]).subtract(1, 'day').endOf('day')
-        .format('YYYY-MM-DD');
-    } else {
-      nextDay = moment(dates[count]).add(1, 'day').endOf('day')
-        .format('YYYY-MM-DD');
-    }
-
     const { result: previousDayData, error: previousDayError } = await hiveEngineRateModel.findOne({
       condition:
-        { dateString: previousDay, type: 'dailyData' },
+        { dateString: { $lte: moment(dates[count]).format('YYYY-MM-DD') }, type: 'dailyData' },
+      sort: { dateString: -1 },
     });
     const { result: nextDayData, error: nextDayError } = await hiveEngineRateModel.findOne({
       condition:
-        { dateString: nextDay, type: 'dailyData' },
+        { dateString: { $gte: moment(dates[count]).format('YYYY-MM-DD') }, type: 'dailyData' },
     });
     if (previousDayError || nextDayError) {
       console.log('Error trying to get single hive engine rates');
