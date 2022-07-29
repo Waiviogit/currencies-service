@@ -23,3 +23,11 @@ exports.findOne = async ({ condition, select, sort }) => {
     return { error };
   }
 };
+
+exports.find = async (condition = {}) => {
+  try {
+    return { result: await CurrenciesRateSchema.find(condition).lean() };
+  } catch (error) {
+    return { error };
+  }
+};

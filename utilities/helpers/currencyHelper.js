@@ -33,6 +33,8 @@ const getUrlFromRequestData = (data) => {
   switch (data.resource) {
     case 'coingecko':
       return `https://api.coingecko.com/api/v3/simple/price?ids=${data.ids.toString()}&vs_currencies=${data.currencies.toString()}&include_24hr_change=true`;
+    case 'history':
+      return `https://api.coingecko.com/api/v3/coins/${data.id}/history?date=${data.date}&localization=false`;
     default:
       return '';
   }
@@ -207,9 +209,11 @@ const getDailyCurrenciesRate = async () => {
   }
 };
 
-const getDailyHiveEngineRate = async () => {
-  const dateString = moment.utc().subtract(1, 'day').format('YYYY-MM-DD');
-  const compareDate = moment.utc().subtract(2, 'day').format('YYYY-MM-DD');
+const getDailyHiveEngineRate = async (date) => {
+  const dateString = date ? moment.utc(date).format('YYYY-MM-DD')
+    : moment.utc().subtract(1, 'day').format('YYYY-MM-DD');
+  const compareDate = date ? moment.utc(date).subtract(1, 'day').format('YYYY-MM-DD')
+    : moment.utc().subtract(2, 'day').format('YYYY-MM-DD');
   for (const base of BASE_CURRENCIES_HIVE_ENGINE) {
     const { result: previous } = await hiveEngineRateModel
       .findOne({ condition: { base, dateString: compareDate, type: 'dailyData' } });
@@ -274,4 +278,5 @@ module.exports = {
   getDailyHiveEngineRate,
   getEngineCurrentPriceFromDieselPool,
   getEngine24hChange,
+  getCurrenciesFromRequest,
 };
