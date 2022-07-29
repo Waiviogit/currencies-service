@@ -13,6 +13,9 @@ currencyRoute.route('/engine-rates')
 currencyRoute.route('/engine-current')
   .get(currencyController.engineCurrent);
 
+currencyRoute.route('/engine-pools-rate')
+  .get(currencyController.enginePoolsRate);
+
 currencyRoute.route('/reservationCurrency')
   .get(currencyController.currenciesForReserve);
 

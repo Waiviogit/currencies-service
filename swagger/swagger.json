@@ -117,6 +117,30 @@
         }
       }
     },
+    "/currencies-api/engine-pools-rate": {
+      "get" : {
+        "tags" : [ "rate" ],
+        "summary" : "Get data pools engine rates",
+        "description" : "Get data pools engine rates",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "symbols",
+          "in" : "query",
+          "description" : "required currencies separated by coma",
+          "required" : true,
+          "enum": ["SWAP.HIVE", "SWAP.HBD", "SWAP.BTC", "SWAP.LTC", "SWAP.ETH"],
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/pools_rates_response"
+            }
+          }
+        }
+      }
+    },
     "/currencies-api/rate/latest" : {
       "get" : {
         "tags" : [ "rate" ],
@@ -206,6 +230,24 @@
         "USD": {
           "type": "number"
         }
+      }
+    },
+    "pools_rates": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "USD": {
+          "type": "number"
+        }
+      }
+    },
+    "pools_rates_response": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "#/definitions/pools_rates"
       }
     },
     "currency_rate_latest_response": {

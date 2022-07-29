@@ -3,6 +3,10 @@ const { DIESEL_POOLS } = require('constants/serviceData');
 const { hiveEngineRateModel } = require('models');
 const moment = require('moment');
 const _ = require('lodash');
+const { marketPools } = require('../hiveEngine');
+const { SYMBOL_TO_TOKEN_PAIR } = require('../../constants/hive-engine');
+const { getCurrentCurrencies } = require('../helpers/currencyHelper');
+const { serviceData } = require('../../constants');
 
 exports.getEngineRates = async ({ base }) => {
   const requests = await Promise.all([await getCurrent({ base }), await getWeekly({ base })]);
@@ -58,4 +62,47 @@ const getWeekly = async ({ base }) => {
     sort: { dateString: -1 },
   });
   return result;
+};
+
+const getTokenPairArr = (symbols) => _.reduce(symbols, (acc, el) => {
+  const pair = SYMBOL_TO_TOKEN_PAIR[el];
+  if (pair) acc.push(pair);
+  return acc;
+}, []);
+
+exports.getEnginePoolsRate = async ({ symbols }) => {
+  const { result: enginePools, error: enginePoolsError } = await marketPools
+    .getMarketPools({ query: { tokenPair: { $in: getTokenPairArr(symbols) } } });
+  if (enginePoolsError) return { error: enginePoolsError };
+  const { result: price } = await getCurrentCurrencies({
+    ids: serviceData.allowedIds,
+    currencies: serviceData.allowedCurrencies,
+    resource: 'coingecko',
+  });
+  const mappedBaseQuote = _.map(enginePools, (p) => {
+    const [base, quote] = p.tokenPair.split(':');
+    return {
+      base,
+      quote,
+      ...p,
+    };
+  });
+  const hivePriceUsd = _.get(price, 'hive.usd');
+
+  const responseArray = _.reduce(symbols, (acc, el) => {
+    if (el === 'SWAP.HIVE') {
+      acc.push({ symbol: el, USD: hivePriceUsd });
+      return acc;
+    }
+    const pool = _.find(mappedBaseQuote, (p) => p.base === el || p.quote === el);
+    if (!pool) return acc;
+    const symbolIsBase = pool.base === el;
+    const usdPrice = symbolIsBase
+      ? Number(pool.basePrice) * hivePriceUsd
+      : Number(pool.quotePrice) * hivePriceUsd;
+    acc.push({ symbol: el, USD: usdPrice });
+    return acc;
+  }, []);
+
+  return { result: responseArray };
 };
