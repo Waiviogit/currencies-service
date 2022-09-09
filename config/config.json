@@ -5,7 +5,10 @@
       "port": 27017,
       "database": "Currencies"
     },
-    "swaggerHost": "www.waivio.com"
+    "swaggerHost": "www.waivio.com",
+    "redis": {
+      "lastBlock": 2
+    }
   },
   "staging": {
     "db": {
@@ -13,7 +16,10 @@
       "port": 27017,
       "database": "Currencies"
     },
-    "swaggerHost": "waiviodev.com"
+    "swaggerHost": "waiviodev.com",
+    "redis": {
+      "lastBlock": 2
+    }
   },
   "development": {
     "db": {
@@ -21,7 +27,10 @@
       "port": 27017,
       "database": "Currencies"
     },
-    "swaggerHost": "localhost:8001"
+    "swaggerHost": "localhost:8001",
+    "redis": {
+      "lastBlock": 2
+    }
   },
   "test": {
     "db": {
@@ -29,6 +38,9 @@
       "port": 27017,
       "database": "CurrenciesTest"
     },
-    "swaggerHost": "localhost:8001"
+    "swaggerHost": "localhost:8001",
+    "redis": {
+      "lastBlock": 7
+    }
   }
 }

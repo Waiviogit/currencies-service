@@ -77,3 +77,7 @@ exports.HIVE_ENGINE_NODES = [
   'https://us.engine.rishipanthee.com', // Finland
   'https://ha.herpc.dtools.dev', // New Jersey
 ];
+
+exports.CACHE_KEYS = {
+  COINGECKO: 'coingecko_cache',
+};

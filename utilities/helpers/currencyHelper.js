@@ -11,6 +11,7 @@ const {
   BASE_CURRENCIES,
   RATE_CURRENCIES,
   DIESEL_POOLS,
+  CACHE_KEYS,
 } = require('constants/serviceData');
 const rateApiHelper = require('utilities/helpers/rateApiHelper');
 const { serviceData } = require('constants/index');
@@ -19,6 +20,7 @@ const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
 const { ObjectId } = require('mongoose').Types;
+const { redisSetter } = require('utilities/redis');
 
 const getCurrentCurrencies = async (data) => {
   const { result } = await getCurrenciesFromRequest(data);
@@ -89,6 +91,13 @@ const collectStatistics = async (type, resource) => {
   result.type = type;
   const { currencies } = await currenciesStatisticsModel.create(result);
   if (currencies) console.log(`Currencies successfully save at ${new Date()}`);
+  await redisSetter.hmsetAsync({
+    key: CACHE_KEYS.COINGECKO,
+    data: {
+      hive: _.get(result, 'hive.usd'),
+      hive_dollar: _.get(result, 'hive_dollar.usd'),
+    },
+  });
 };
 
 const getEngineCurrentPriceFromDieselPool = async (_id) => {
