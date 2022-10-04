@@ -20,7 +20,9 @@ const moment = require('moment');
 const axios = require('axios');
 const _ = require('lodash');
 const { ObjectId } = require('mongoose').Types;
-const { redisSetter } = require('utilities/redis');
+const { redisSetter, redisGetter } = require('utilities/redis');
+const jsonHelper = require('utilities/helpers/jsonHelper');
+const crypto = require('crypto');
 
 const getCurrentCurrencies = async (data) => {
   const { result } = await getCurrenciesFromRequest(data);
@@ -42,10 +44,32 @@ const getUrlFromRequestData = (data) => {
   }
 };
 
+const getCacheKey = (data = {}) => crypto
+  .createHash('md5')
+  .update(`${JSON.stringify(data)}`, 'utf8')
+  .digest('hex');
+
+const cacheCoingeckoPrice = async ({ key, data }) => {
+  await redisSetter.setAsync({ key: `cached_price:${key}`, data: JSON.stringify(data) });
+  await redisSetter.expireAsync({ key: `cached_price:${key}`, ttl: 60 });
+};
+
+const getPriceFromCache = async ({ key }) => {
+  const { result } = await redisGetter.getAsync({ key: `cached_price:${key}` });
+  if (!result) return;
+  const parsedData = jsonHelper.parseJson(result, null);
+  if (!parsedData) return;
+  return parsedData;
+};
+
 const getCurrenciesFromRequest = async (data) => {
+  const cacheKey = getCacheKey(data);
+  const cache = await getPriceFromCache({ key: cacheKey });
+  if (cache) return { result: cache };
   const url = getUrlFromRequestData(data);
   try {
     const result = await axios.get(url);
+    await cacheCoingeckoPrice({ key: cacheKey, data: result.data });
     return { result: result.data };
   } catch (error) {
     return {

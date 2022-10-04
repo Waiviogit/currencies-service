@@ -7,7 +7,8 @@
     },
     "swaggerHost": "www.waivio.com",
     "redis": {
-      "lastBlock": 2
+      "lastBlock": 2,
+      "mainFeedsCache": 10
     }
   },
   "staging": {
@@ -18,7 +19,8 @@
     },
     "swaggerHost": "waiviodev.com",
     "redis": {
-      "lastBlock": 2
+      "lastBlock": 2,
+      "mainFeedsCache": 10
     }
   },
   "development": {
@@ -29,7 +31,8 @@
     },
     "swaggerHost": "localhost:8001",
     "redis": {
-      "lastBlock": 2
+      "lastBlock": 2,
+      "mainFeedsCache": 10
     }
   },
   "test": {
@@ -40,7 +43,8 @@
     },
     "swaggerHost": "localhost:8001",
     "redis": {
-      "lastBlock": 7
+      "lastBlock": 7,
+      "mainFeedsCache": 7
     }
   }
 }
