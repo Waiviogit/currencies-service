@@ -3,6 +3,7 @@ const {
 } = require('utilities/operations');
 const validators = require('controllers/validators');
 const _ = require('lodash');
+const { SUPPORTED_CURRENCIES } = require('../constants/serviceData');
 
 const show = async (req, res, next) => {
   const value = validators.validate({
@@ -31,6 +32,10 @@ const currencyRateLatest = async (req, res, next) => {
   const { rates, error } = await currencyRates.getCurrencyRatesLatest(value);
   if (error) return next(error);
   res.status(200).json(rates);
+};
+
+const currencyAvailable = async (req, res, next) => {
+  res.status(200).json([...Object.values(SUPPORTED_CURRENCIES)]);
 };
 
 const engineCurrencies = async (req, res, next) => {
@@ -71,5 +76,11 @@ const enginePoolsRate = async (req, res, next) => {
 };
 
 module.exports = {
-  show, currenciesForReserve, currencyRateLatest, engineCurrencies, engineCurrent, enginePoolsRate,
+  show,
+  currenciesForReserve,
+  currencyRateLatest,
+  engineCurrencies,
+  engineCurrent,
+  enginePoolsRate,
+  currencyAvailable,
 };

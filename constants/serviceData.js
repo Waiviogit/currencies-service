@@ -7,14 +7,14 @@ exports.SUPPORTED_CURRENCIES = {
   USD: 'USD',
   CAD: 'CAD',
   EUR: 'EUR',
+  CHF: 'CHF',
+  GBP: 'GBP',
   AUD: 'AUD',
   MXN: 'MXN',
-  GBP: 'GBP',
   JPY: 'JPY',
   CNY: 'CNY',
   RUB: 'RUB',
   UAH: 'UAH',
-  CHF: 'CHF',
 };
 
 exports.BASE_CURRENCIES = [

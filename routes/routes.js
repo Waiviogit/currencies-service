@@ -21,5 +21,7 @@ currencyRoute.route('/reservationCurrency')
 
 currencyRoute.route('/rate/latest')
   .get(currencyController.currencyRateLatest);
+currencyRoute.route('/rate/available')
+  .get(currencyController.currencyAvailable);
 
 module.exports = currencyRoute;
