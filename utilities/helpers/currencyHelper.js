@@ -23,6 +23,7 @@ const { ObjectId } = require('mongoose').Types;
 const { redisSetter, redisGetter } = require('utilities/redis');
 const jsonHelper = require('utilities/helpers/jsonHelper');
 const crypto = require('crypto');
+const { CACHE_KEY } = require('../../constants/redis');
 
 const getCurrentCurrencies = async (data) => {
   const { result } = await getCurrenciesFromRequest(data);
@@ -49,13 +50,13 @@ const getCacheKey = (data = {}) => crypto
   .update(`${JSON.stringify(data)}`, 'utf8')
   .digest('hex');
 
-const cacheCoingeckoPrice = async ({ key, data }) => {
-  await redisSetter.setAsync({ key: `cached_price:${key}`, data: JSON.stringify(data) });
-  await redisSetter.expireAsync({ key: `cached_price:${key}`, ttl: 60 });
+const addToCache = async ({ key, ttl = 60, data }) => {
+  await redisSetter.setAsync({ key, data: JSON.stringify(data) });
+  await redisSetter.expireAsync({ key, ttl });
 };
 
-const getPriceFromCache = async ({ key }) => {
-  const { result } = await redisGetter.getAsync({ key: `cached_price:${key}` });
+const getFromCache = async ({ key }) => {
+  const { result } = await redisGetter.getAsync({ key });
   if (!result) return;
   const parsedData = jsonHelper.parseJson(result, null);
   if (!parsedData) return;
@@ -63,13 +64,13 @@ const getPriceFromCache = async ({ key }) => {
 };
 
 const getCurrenciesFromRequest = async (data) => {
-  const cacheKey = getCacheKey(data);
-  const cache = await getPriceFromCache({ key: cacheKey });
+  const cacheKey = `${CACHE_KEY.COINGECKO}:${getCacheKey(data)}`;
+  const cache = await getFromCache({ key: cacheKey });
   if (cache) return { result: cache };
   const url = getUrlFromRequestData(data);
   try {
     const result = await axios.get(url);
-    await cacheCoingeckoPrice({ key: cacheKey, data: result.data });
+    await addToCache({ key: cacheKey, data: result.data });
     return { result: result.data };
   } catch (error) {
     return {
@@ -321,4 +322,7 @@ module.exports = {
   getEngineCurrentPriceFromDieselPool,
   getEngine24hChange,
   getCurrenciesFromRequest,
+  addToCache,
+  getFromCache,
+  getCacheKey,
 };
