@@ -211,6 +211,7 @@ const getDailyCurrency = async (date) => {
   ]);
   if (error) return { error };
   const [dataToSave] = result;
+  dataToSave.createdAt = moment.utc().subtract(1, 'day').format();
   if (date) {
     dataToSave.createdAt = moment.utc(date).format();
     dataToSave._id = new ObjectId(moment.utc(date).unix());
