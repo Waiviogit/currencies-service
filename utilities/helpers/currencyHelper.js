@@ -171,8 +171,8 @@ const collectEngineStatistics = async (type, resource) => {
 };
 
 const getDailyCurrency = async (date) => {
-  let startOfDay = moment().subtract(1, 'day').startOf('day').toDate();
-  let endOfDay = moment().subtract(1, 'day').endOf('day').toDate();
+  let startOfDay = moment.utc().subtract(1, 'day').startOf('day').toDate();
+  let endOfDay = moment.utc().subtract(1, 'day').endOf('day').toDate();
   if (date) {
     startOfDay = moment(date).startOf('day').toDate();
     endOfDay = moment(date).endOf('day').toDate();
@@ -218,11 +218,6 @@ const getDailyCurrency = async (date) => {
   const { currencies } = await currenciesStatisticsModel.create(dataToSave);
   if (currencies) console.log(`Daily currencies successfully save at ${date || new Date()}`);
 };
-
-(async () => {
-  await getDailyCurrency();
-  console.log();
-})();
 
 const getCurrencyForReservation = async (data) => {
   const { result: currentCurrency } = await getCurrentCurrencies(data);
