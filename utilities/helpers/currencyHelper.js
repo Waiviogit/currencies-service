@@ -95,10 +95,14 @@ const getWeaklyCurrencies = async (currentCurrency) => {
       (currency) => moment(currency.createdAt).format('D')),
     moment(currentCurrency.createdAt).format('D'),
   );
-  if (hasCurrentDate) return weeklyCurrencies;
 
-  weeklyCurrencies.pop();
-  weeklyCurrencies.unshift(currentCurrency);
+  if (hasCurrentDate) {
+    weeklyCurrencies.shift();
+    weeklyCurrencies.unshift(currentCurrency);
+  } else {
+    weeklyCurrencies.pop();
+    weeklyCurrencies.unshift(currentCurrency);
+  }
 
   return weeklyCurrencies;
 };
