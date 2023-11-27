@@ -74,11 +74,10 @@ exports.STATISTIC_RECORD_TYPES = {
 
 exports.HIVE_ENGINE_NODES = [
   'https://herpc.dtools.dev',
-  'https://engine.rishipanthee.com',
-  'https://api2.hive-engine.com/rpc',
   'https://api.primersion.com',
   'https://herpc.kanibot.com',
-  'https://ha.herpc.dtools.dev',
+  'https://engine.deathwing.me',//ok
+  'https://he.sourov.dev',
 ];
 
 exports.CACHE_KEYS = {
