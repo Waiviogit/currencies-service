@@ -46,6 +46,17 @@ exports.BASE_CURRENCIES_HIVE_ENGINE = [
   this.SUPPORTED_HIVE_ENGINE_TOKENS.WAIV,
 ];
 
+exports.CHART_TYPES = [
+  'day',
+  'sevenDays',
+  'month',
+  'threeMonths',
+  'sixMonths',
+  'year',
+  'twoYears',
+  'all',
+];
+
 exports.RATE_HIVE_ENGINE = [
   this.SUPPORTED_CRYPTO_TOKENS.HIVE,
   this.SUPPORTED_CURRENCIES.USD,
@@ -76,7 +87,7 @@ exports.HIVE_ENGINE_NODES = [
   'https://herpc.dtools.dev',
   'https://api.primersion.com',
   'https://herpc.kanibot.com',
-  'https://engine.deathwing.me',//ok
+  'https://engine.deathwing.me', // ok
   'https://he.sourov.dev',
 ];
 
