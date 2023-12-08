@@ -35,7 +35,7 @@ exports.find = async ({
 };
 
 exports.findOne = async ({
-  condition, projection, sort = {}
+  condition, projection, sort = {},
 }) => {
   try {
     return {
@@ -43,6 +43,18 @@ exports.findOne = async ({
         .findOne(condition, projection)
         .sort(sort)
         .lean(),
+    };
+  } catch (error) {
+    return { error };
+  }
+};
+
+exports.aggregate = async ({
+  pipeline,
+}) => {
+  try {
+    return {
+      result: await HiveEngineRateSchema.aggregate(pipeline),
     };
   } catch (error) {
     return { error };

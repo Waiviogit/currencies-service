@@ -1,5 +1,9 @@
 const {
-  currencyOperations, reservationCurrency, currencyRates, engineRates,
+  currencyOperations,
+  reservationCurrency,
+  currencyRates,
+  engineRates,
+  engineChart,
 } = require('utilities/operations');
 const {
   getCacheKey, addToCache, getFromCache,
@@ -90,6 +94,19 @@ const enginePoolsRate = async (req, res, next) => {
   res.status(200).json(result);
 };
 
+const engineWaivChart = async (req, res, next) => {
+  const value = validators.validate(
+    req.query,
+    validators.currency.engineChartSchema,
+    next,
+  );
+
+  if (!value) return;
+  const result = await engineChart.getChart(value);
+
+  res.status(200).json(result);
+};
+
 module.exports = {
   show,
   currenciesForReserve,
@@ -98,4 +115,5 @@ module.exports = {
   engineCurrent,
   enginePoolsRate,
   currencyAvailable,
+  engineWaivChart,
 };

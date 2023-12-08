@@ -16,6 +16,7 @@ const rates = () => _.reduce(
   },
   {
     dateString: { type: String, index: true },
+    dateTime: { type: Date, index: true },
     base: {
       type: String, default: SUPPORTED_HIVE_ENGINE_TOKENS.WAIV, valid: BASE_CURRENCIES_HIVE_ENGINE,
     },

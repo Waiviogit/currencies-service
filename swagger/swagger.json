@@ -72,6 +72,48 @@
         }
       }
     },
+    "/currencies-api/engine-chart/waiv" : {
+      "get" : {
+        "tags" : [ "market" ],
+        "summary" : "Get waiv chart",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "query",
+          "description" : "chart type",
+          "required" : false,
+          "type" : "string",
+          "enum": ["day",
+            "sevenDays",
+            "month",
+            "threeMonths",
+            "sixMonths",
+            "year",
+            "twoYears",
+            "all"
+          ]
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "object"
+                  },
+                  "averageRateUSD": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/currencies-api/marketInfo" : {
       "get" : {
         "tags" : [ "market" ],

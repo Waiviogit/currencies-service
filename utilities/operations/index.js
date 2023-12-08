@@ -3,4 +3,5 @@ module.exports = {
   currencyOperations: require('./currency'),
   reservationCurrency: require('./reservationCurrency'),
   engineRates: require('./engineRates'),
+  engineChart: require('./engineCurrecyChart'),
 };
