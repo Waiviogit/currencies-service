@@ -61,10 +61,11 @@ exports.DIESEL_POOLS = [
 ];
 
 exports.CURRENCY_RATE_API = {
-  HOST: 'https://api.exchangerate.host',
-  LATEST: '/latest',
+  HOST: 'http://api.exchangerate.host',
+  LATEST: '/live',
   TIME_SERIES: '/timeseries',
-  CALLBACK: (value) => _.get(value, 'data.rates'),
+  TIME_FRAME: '/timeframe',
+  CALLBACK: (value) => _.get(value, 'data.quotes'),
 };
 
 exports.STATISTIC_RECORD_TYPES = {

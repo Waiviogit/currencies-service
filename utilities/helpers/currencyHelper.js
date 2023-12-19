@@ -232,19 +232,33 @@ const getCurrencyForReservation = async (data) => {
   };
 };
 
+const reMapRates = {
+  CAD: 'USDCAD',
+  EUR: 'USDEUR',
+  CHF: 'USDCHF',
+  GBP: 'USDGBP',
+  AUD: 'USDAUD',
+  MXN: 'USDMXN',
+  JPY: 'USDJPY',
+  CNY: 'USDCNY',
+  RUB: 'USDRUB',
+  UAH: 'USDUAH',
+};
+
 const getDailyCurrenciesRate = async () => {
   for (const base of BASE_CURRENCIES) {
     const { rates, error } = await rateApiHelper.getRates({
       url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.LATEST}`,
-      params: { base, symbols: RATE_CURRENCIES.join(',') },
+      params: { base, symbols: RATE_CURRENCIES.join(','), access_key: process.env.CURRENCY_RATE_API_KEY },
       callback: CURRENCY_RATE_API.CALLBACK,
     });
     if (error || !rates) return console.error(error.message || 'Something wrong with request');
 
-    const updateData = _.reduce(rates, (acc, el, index) => {
-      acc[`rates.${index}`] = el;
+    const updateData = _.reduce(RATE_CURRENCIES, (acc, el) => {
+      acc[`rates.${el}`] = rates[reMapRates[el]];
       return acc;
     }, {});
+
     const currentDate = () => moment().format('YYYY-MM-DD');
     const { result } = await currenciesRateModel
       .updateOne({ base, dateString: currentDate() }, updateData);

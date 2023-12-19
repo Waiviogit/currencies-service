@@ -11,7 +11,7 @@ const {
 const { ObjectId } = require('mongoose').Types;
 
 exports.checkRatesPeriod = async (startDate, endDate) => {
-  await checkCurrenciesRates(startDate, endDate);
+//  await checkCurrenciesRates(startDate, endDate);
   await checkCurrenciesStatistics(startDate, endDate);
   await checkHiveEngineRates(startDate, endDate);
   console.log('task completed!');
