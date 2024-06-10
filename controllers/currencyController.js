@@ -16,8 +16,15 @@ const show = async (req, res, next) => {
     resource: req.query.resource || 'coingecko',
   }, validators.currency.currencySchema, next);
   if (!value) return;
+
+  const cacheKey = `${CACHE_KEY.MARKET_INFO}:${getCacheKey(value)}`;
+  const cache = await getFromCache({ key: cacheKey });
+  if (cache) return res.status(200).json(cache);
+
+
   const { result, error } = await currencyOperations.getCurrencies(value);
   if (error) return next(error);
+  await addToCache({ key: cacheKey, data: result});
   res.status(200).json(result);
 };
 
