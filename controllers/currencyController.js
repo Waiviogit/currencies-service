@@ -84,9 +84,14 @@ const enginePoolsRate = async (req, res, next) => {
     next,
   );
 
+  const cacheKey = `${CACHE_KEY.ENGINE_POOL}:${getCacheKey(_.split(req.query.symbols, ','))}`;
+  const cache = await getFromCache({ key: cacheKey });
+  if (cache) return res.status(200).json(cache);
+
   if (!value) return;
   const { result, error } = await engineRates.getEnginePoolsRate(value);
   if (error) return next(error);
+  await addToCache({ key: cacheKey, data: result});
   res.status(200).json(result);
 };
 
