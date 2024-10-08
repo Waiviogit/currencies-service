@@ -21,10 +21,9 @@ const show = async (req, res, next) => {
   const cache = await getFromCache({ key: cacheKey });
   if (cache) return res.status(200).json(cache);
 
-
   const { result, error } = await currencyOperations.getCurrencies(value);
   if (error) return next(error);
-  await addToCache({ key: cacheKey, data: result});
+  await addToCache({ key: cacheKey, data: result });
   res.status(200).json(result);
 };
 
@@ -98,8 +97,30 @@ const enginePoolsRate = async (req, res, next) => {
   if (!value) return;
   const { result, error } = await engineRates.getEnginePoolsRate(value);
   if (error) return next(error);
-  await addToCache({ key: cacheKey, data: result});
+  await addToCache({ key: cacheKey, data: result });
   res.status(200).json(result);
+};
+
+const withdrawPairs = async (req, res, next) => {
+  try {
+    const response = await fetch('https://converter-api.hive-engine.com/api/pairs/');
+    const result = await response.json();
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error) return next(error);
+  }
+};
+
+const withdrawCoins = async (req, res, next) => {
+  try {
+    const response = await fetch('https://converter-api.hive-engine.com/api/coins/');
+    const result = await response.json();
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error) return next(error);
+  }
 };
 
 module.exports = {
@@ -110,4 +131,6 @@ module.exports = {
   engineCurrent,
   enginePoolsRate,
   currencyAvailable,
+  withdrawPairs,
+  withdrawCoins,
 };

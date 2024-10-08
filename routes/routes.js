@@ -24,4 +24,9 @@ currencyRoute.route('/rate/latest')
 currencyRoute.route('/rate/available')
   .get(currencyController.currencyAvailable);
 
+currencyRoute.route('/withdraw/pairs')
+  .get(currencyController.withdrawPairs);
+currencyRoute.route('/withdraw/coins')
+  .get(currencyController.withdrawCoins);
+
 module.exports = currencyRoute;

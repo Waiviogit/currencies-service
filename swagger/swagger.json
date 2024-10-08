@@ -17,6 +17,10 @@
     {
       "name": "rate",
       "description": "Return data rate for currencies"
+    },
+    {
+      "name": "tools",
+      "description": "tools"
     }
   ],
   "schemes": [
@@ -187,9 +191,122 @@
           }
         }
       }
+    },
+    "/currencies-api/withdraw/pairs" : {
+      "get" : {
+        "tags" : [ "tools" ],
+        "summary" : "Get data about withdraw pairs",
+        "description" : "Get data about withdraw pairs",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type": "array",
+              "items": {
+                "$ref" : "#/definitions/Pair"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/currencies-api/withdraw/coins" : {
+      "get" : {
+        "tags" : [ "tools" ],
+        "summary" : "Get data about withdraw coins",
+        "description" : "Get data about withdraw coins",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type": "array",
+              "items": {
+                "$ref" : "#/definitions/Coin"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "definitions" : {
+    "Coin": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "The symbol of the coin",
+          "example": "TELOSSAND"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The display name of the coin",
+          "example": "Telos Sandiegocoin (SAND)"
+        },
+        "our_account": {
+          "type": "string",
+          "description": "The account associated with this coin",
+          "example": "sandiegocoin"
+        },
+        "can_issue": {
+          "type": "boolean",
+          "description": "Indicates whether the coin can be issued",
+          "example": true
+        },
+        "coin_type": {
+          "type": "string",
+          "description": "The type of the coin",
+          "example": "telos"
+        },
+        "symbol_id": {
+          "type": "string",
+          "description": "The symbol ID for the coin",
+          "example": "SAND"
+        }
+      }
+    },
+    "Pair": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier for the pair",
+          "example": 1
+        },
+        "from_coin": {
+          "type": "string",
+          "description": "URL to the details of the from_coin",
+          "example": "https://converter-api.hive-engine.com/api/coins/BTC/"
+        },
+        "from_coin_symbol": {
+          "type": "string",
+          "description": "The symbol of the from_coin",
+          "example": "BTC"
+        },
+        "to_coin": {
+          "type": "string",
+          "description": "URL to the details of the to_coin",
+          "example": "https://converter-api.hive-engine.com/api/coins/SWAP.BTC/"
+        },
+        "to_coin_symbol": {
+          "type": "string",
+          "description": "The symbol of the to_coin",
+          "example": "SWAP.BTC"
+        },
+        "exchange_rate": {
+          "type": "string",
+          "description": "The exchange rate between from_coin and to_coin",
+          "example": "1.00000000000000000000"
+        },
+        "__str__": {
+          "type": "string",
+          "description": "String representation of the conversion pair",
+          "example": "BTC -> SWAP.BTC (1.0000 SWAP.BTC per BTC)"
+        }
+      }
+    },
     "available_rate": {
       "type": "array",
       "items": {
