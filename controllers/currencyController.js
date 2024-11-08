@@ -123,6 +123,19 @@ const withdrawCoins = async (req, res, next) => {
   }
 };
 
+const getEngineChart = async (req, res, next) => {
+  const value = validators.validate(
+    req.query,
+    validators.currency.engineChartSchema,
+    next,
+  );
+
+  if (!value) return;
+  const result = await engineRates.getChart(value);
+
+  res.status(200).json(result);
+};
+
 module.exports = {
   show,
   currenciesForReserve,
@@ -133,4 +146,5 @@ module.exports = {
   currencyAvailable,
   withdrawPairs,
   withdrawCoins,
+  getEngineChart,
 };

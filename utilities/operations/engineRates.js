@@ -8,7 +8,7 @@ const { SYMBOL_TO_TOKEN_PAIR } = require('../../constants/hive-engine');
 const { getCurrentCurrencies } = require('../helpers/currencyHelper');
 const { serviceData } = require('../../constants');
 
-exports.getEngineRates = async ({ base }) => {
+const getEngineRates = async ({ base }) => {
   const requests = await Promise.all([await getCurrent({ base }), await getWeekly({ base })]);
   for (const request of requests) {
     if (_.has(request, 'error')) return { error: request.error };
@@ -23,7 +23,7 @@ exports.getEngineRates = async ({ base }) => {
   return { current, weekly };
 };
 
-exports.getEngineCurrent = async ({ token }) => {
+const getEngineCurrent = async ({ token }) => {
   const current = await getCurrent({ base: token });
   if (_.has(current, 'error')) return { error: new Error('bad request') };
   const { rates: { HIVE, USD } } = current;
@@ -64,13 +64,47 @@ const getWeekly = async ({ base }) => {
   return result;
 };
 
+const CHART_PERIODS = {
+  ONE_DAY: '1d',
+  WEEK: '7d',
+  MONTH: '1m',
+  THREE_MONTH: '3m',
+  SIX_MONTH: '6m',
+  ONE_YEAR: '1y',
+  TWO_YEARS: '2y',
+  ALL: 'all',
+};
+
+const MATCH_CONDITION_BY_PERIOD = {
+  [CHART_PERIODS.ONE_DAY]: (base) => ({ base, type: 'ordinaryData', dateString: { $gte: moment().subtract(1, 'day').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.WEEK]: (base) => ({ base, type: 'ordinaryData', dateString: { $gte: moment().subtract(6, 'day').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.MONTH]: (base) => ({ base, type: 'dailyData', dateString: { $gte: moment().subtract(1, 'month').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.THREE_MONTH]: (base) => ({ base, type: 'dailyData', dateString: { $gte: moment().subtract(3, 'month').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.SIX_MONTH]: (base) => ({ base, type: 'dailyData', dateString: { $gte: moment().subtract(6, 'month').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.ONE_YEAR]: (base) => ({ base, type: 'dailyData', dateString: { $gte: moment().subtract(12, 'month').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.TWO_YEARS]: (base) => ({ base, type: 'dailyData', dateString: { $gte: moment().subtract(24, 'month').format('YYYY-MM-DD') } }),
+  [CHART_PERIODS.ALL]: (base) => ({ base, type: 'dailyData' }),
+};
+
+const getChart = async ({ period, base }) => {
+  const condition = (MATCH_CONDITION_BY_PERIOD[period]
+      || MATCH_CONDITION_BY_PERIOD[CHART_PERIODS.MONTH])(base);
+
+  const { result } = await hiveEngineRateModel.find({
+    condition,
+    projection: { type: 0 },
+    sort: { dateString: -1 },
+  });
+  return result || [];
+};
+
 const getTokenPairArr = (symbols) => _.reduce(symbols, (acc, el) => {
   const pair = SYMBOL_TO_TOKEN_PAIR[el];
   if (pair) acc.push(pair);
   return acc;
 }, []);
 
-exports.getEnginePoolsRate = async ({ symbols }) => {
+const getEnginePoolsRate = async ({ symbols }) => {
   const { result: enginePools, error: enginePoolsError } = await marketPools
     .getMarketPools({ query: { tokenPair: { $in: getTokenPairArr(symbols) } } });
   if (enginePoolsError) return { error: enginePoolsError };
@@ -105,4 +139,12 @@ exports.getEnginePoolsRate = async ({ symbols }) => {
   }, []);
 
   return { result: responseArray };
+};
+
+module.exports = {
+  getEngineRates,
+  getEngineCurrent,
+  getEnginePoolsRate,
+  getChart,
+  CHART_PERIODS,
 };

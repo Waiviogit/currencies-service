@@ -4,9 +4,11 @@ const {
   BASE_CURRENCIES,
   RATE_CURRENCIES,
 } = require('constants/serviceData');
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const { serviceData } = require('constants/index');
 const { SYMBOLS_FOR_POOL_RATES } = require('../../constants/hive-engine');
+const { CHART_PERIODS } = require('../../utilities/operations/engineRates');
+const { SUPPORTED_HIVE_ENGINE_TOKENS } = require('../../constants/serviceData');
 
 exports.currencySchema = Joi.object().keys({
   resource: Joi.string().valid('coingecko'),
@@ -39,4 +41,13 @@ exports.engineRatesSchema = Joi.object().keys({
 
 exports.engineCurrentSchema = Joi.object().keys({
   token: Joi.string().valid(...BASE_CURRENCIES_HIVE_ENGINE).required(),
+});
+
+exports.engineChartSchema = Joi.object().keys({
+  period: Joi.string()
+    .valid(...Object.values(CHART_PERIODS))
+    .default(CHART_PERIODS.MONTH),
+  base: Joi.string()
+    .valid(...BASE_CURRENCIES_HIVE_ENGINE)
+    .default(SUPPORTED_HIVE_ENGINE_TOKENS.WAIV),
 });

@@ -76,6 +76,39 @@
         }
       }
     },
+    "/currencies-api/engine-chart" : {
+      "get" : {
+        "tags" : [ "market" ],
+        "summary" : "Get chart",
+        "description" : "Get chart",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "base",
+          "in" : "query",
+          "description" : "base hive-engine currency",
+          "type" : "string",
+          "enum": ["WAIV"],
+          "default": "WAIV"
+        },
+          {
+            "name" : "period",
+            "in" : "query",
+            "description" : "time - period",
+            "type" : "string",
+            "enum": ["1d", "7d", "1m", "3m", "6m", "1y", "2y", "all"],
+            "default": "1m"
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/engine_rate_response"
+            }
+          }
+        }
+      }
+    },
     "/currencies-api/marketInfo" : {
       "get" : {
         "tags" : [ "market" ],
