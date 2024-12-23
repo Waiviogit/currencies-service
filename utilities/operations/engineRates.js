@@ -95,7 +95,14 @@ const getChart = async ({ period, base }) => {
     projection: { type: 0 },
     sort: { dateString: -1 },
   });
-  return result || [];
+
+  const change = currencyHelper.getEngine24hChange({
+    current: result.at(0)?.rates, previous: result.at(-1)?.rates,
+  });
+  return {
+    result: result || [],
+    change,
+  };
 };
 
 const getTokenPairArr = (symbols) => _.reduce(symbols, (acc, el) => {
