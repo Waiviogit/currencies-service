@@ -86,6 +86,40 @@ const MATCH_CONDITION_BY_PERIOD = {
   [CHART_PERIODS.ALL]: (base) => ({ base, type: 'dailyData' }),
 };
 
+const sliceStartAndEnd = (arr, startCount, endCount) => {
+  const startElements = arr.slice(0, startCount);
+  const endElements = arr.slice(arr.length - endCount, arr.length);
+  return { startElements, endElements };
+};
+
+const countAvgRate = (collection) => {
+  const HIVE = _.meanBy(collection, (el) => el.rates?.HIVE);
+  const USD = _.meanBy(collection, (el) => el.rates?.USD);
+
+  return { HIVE, USD };
+};
+
+const START_END_BY_PERIOD = {
+  [CHART_PERIODS.ONE_DAY]: { startCount: 12, endCount: 12 },
+  [CHART_PERIODS.WEEK]: { startCount: 36, endCount: 36 },
+  [CHART_PERIODS.MONTH]: { startCount: 3, endCount: 3 },
+  [CHART_PERIODS.THREE_MONTH]: { startCount: 3, endCount: 3 },
+  [CHART_PERIODS.SIX_MONTH]: { startCount: 3, endCount: 3 },
+  [CHART_PERIODS.ONE_YEAR]: { startCount: 3, endCount: 3 },
+  [CHART_PERIODS.TWO_YEARS]: { startCount: 3, endCount: 3 },
+  [CHART_PERIODS.ALL]: { startCount: 3, endCount: 3 },
+};
+
+const getChangeByPeriod = ({ collection, period }) => {
+  const { startCount, endCount } = START_END_BY_PERIOD[period];
+  const { startElements, endElements } = sliceStartAndEnd(collection, startCount, endCount);
+  const current = countAvgRate(startElements);
+  const previous = period === CHART_PERIODS.ALL
+    ? { HIVE: 0.01, USD: 0.005 }
+    : countAvgRate(endElements);
+  return currencyHelper.getEngine24hChange({ current, previous });
+};
+
 const getChart = async ({ period, base }) => {
   const condition = (MATCH_CONDITION_BY_PERIOD[period]
       || MATCH_CONDITION_BY_PERIOD[CHART_PERIODS.MONTH])(base);
@@ -96,9 +130,8 @@ const getChart = async ({ period, base }) => {
     sort: { dateString: -1 },
   });
 
-  const change = currencyHelper.getEngine24hChange({
-    current: result.at(0)?.rates, previous: result.at(-1)?.rates,
-  });
+  const change = getChangeByPeriod({ collection: result, period });
+
   return {
     result: result || [],
     change,
