@@ -8,6 +8,9 @@ const { SYMBOL_TO_TOKEN_PAIR } = require('../../constants/hive-engine');
 const { getCurrentCurrencies } = require('../helpers/currencyHelper');
 const { serviceData } = require('../../constants');
 
+const START_PRICE_WAIV_USD = 0.005;
+const START_PRICE_WAIV_HIVE = 0.01;
+
 const getEngineRates = async ({ base }) => {
   const requests = await Promise.all([await getCurrent({ base }), await getWeekly({ base })]);
   for (const request of requests) {
@@ -115,7 +118,7 @@ const getChangeByPeriod = ({ collection, period }) => {
   const { startElements, endElements } = sliceStartAndEnd(collection, startCount, endCount);
   const current = countAvgRate(startElements);
   const previous = period === CHART_PERIODS.ALL
-    ? { HIVE: 0.01, USD: 0.005 }
+    ? { HIVE: START_PRICE_WAIV_HIVE, USD: START_PRICE_WAIV_USD }
     : countAvgRate(endElements);
   return currencyHelper.getEngine24hChange({ current, previous });
 };
@@ -132,9 +135,14 @@ const getChart = async ({ period, base }) => {
 
   const change = getChangeByPeriod({ collection: result, period });
 
+  const lowUSD = CHART_PERIODS.ALL ? START_PRICE_WAIV_USD : _.minBy(result, (el) => el?.rates?.USD);
+  const highUSD = _.maxBy(result, (el) => el?.rates?.USD);
+
   return {
     result: result || [],
     change,
+    lowUSD,
+    highUSD,
   };
 };
 
