@@ -135,8 +135,10 @@ const getChart = async ({ period, base }) => {
 
   const change = getChangeByPeriod({ collection: result, period });
 
-  const lowUSD = CHART_PERIODS.ALL ? START_PRICE_WAIV_USD : _.minBy(result, (el) => el?.rates?.USD);
-  const highUSD = _.maxBy(result, (el) => el?.rates?.USD);
+  const lowUSD = period === CHART_PERIODS.ALL
+    ? START_PRICE_WAIV_USD
+    : _.minBy(result, (el) => el?.rates?.USD)?.rates?.USD;
+  const highUSD = _.maxBy(result, (el) => el?.rates?.USD)?.rates?.USD;
 
   return {
     result: result || [],
