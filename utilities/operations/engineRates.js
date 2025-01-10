@@ -133,6 +133,10 @@ const getChart = async ({ period, base }) => {
     sort: { dateString: -1 },
   });
 
+  if (period === CHART_PERIODS.ONE_DAY) {
+    result.push(await getCurrent({ base }));
+  }
+
   const change = getChangeByPeriod({ collection: result, period });
 
   const lowUSD = period === CHART_PERIODS.ALL
