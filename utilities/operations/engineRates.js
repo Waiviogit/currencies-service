@@ -133,7 +133,7 @@ const getChart = async ({ period, base }) => {
     sort: { dateString: -1 },
   });
 
-  result.push(await getCurrent({ base }));
+  result.unshift(await getCurrent({ base }));
 
   const change = getChangeByPeriod({ collection: result, period });
 
