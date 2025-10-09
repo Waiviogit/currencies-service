@@ -24,9 +24,9 @@ exports.findOne = async ({ condition, select, sort }) => {
   }
 };
 
-exports.find = async (condition = {}) => {
+exports.find = async (condition = {}, projection = {}) => {
   try {
-    return { result: await CurrenciesRateSchema.find(condition).lean() };
+    return { result: await CurrenciesRateSchema.find(condition, projection).lean() };
   } catch (error) {
     return { error };
   }

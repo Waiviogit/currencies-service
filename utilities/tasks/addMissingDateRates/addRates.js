@@ -11,21 +11,27 @@ module.exports = async ({ date }) => {
   console.log('Possible hive engine rates missing rate', missingDate);
   const base = 'USD';
   const { rates, error } = await rateApiHelper.getRates({
-    url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.TIME_SERIES}`,
+    url: `${CURRENCY_RATE_API.HOST}${CURRENCY_RATE_API.TIME_FRAME}`,
     params: {
-      start_date: missingDate, end_date: missingDate, base: 'USD', symbols: RATE_CURRENCIES.toString(),
+      start_date: missingDate,
+      end_date: missingDate,
+      base: 'USD',
+      symbols: RATE_CURRENCIES.toString(),
+      access_key: process.env.CURRENCY_RATE_API_KEY,
     },
     callback: CURRENCY_RATE_API.CALLBACK,
   });
   if (error) return console.error(missingDate, error);
+  const rateDate = rates[missingDate];
+  if (!rateDate) return;
 
-  for (const ratesKey in rates) {
-    const updateData = _.reduce(RATE_CURRENCIES, (acc, el) => {
-      acc[`rates.${el}`] = _.get(rates, `${ratesKey}[${el}]`);
-      return acc;
-    }, {});
-    await currenciesRateModel.updateOne({ dateString: ratesKey, base }, updateData);
-  }
+  const updateData = _.reduce(RATE_CURRENCIES, (acc, el) => {
+    acc[`rates.${el}`] = _.get(rateDate, `USD${el}`);
+    console.log();
+    return acc;
+  }, {});
+
+  await currenciesRateModel.updateOne({ dateString: missingDate, base }, updateData);
 
   console.info('task completed');
 };

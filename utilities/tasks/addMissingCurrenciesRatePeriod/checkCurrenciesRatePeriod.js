@@ -2,41 +2,42 @@ const { currenciesRateModel, currenciesStatisticsModel, hiveEngineRateModel } = 
 const moment = require('moment');
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
+const { ObjectId } = require('mongoose').Types;
 const addRatesByDate = require('../addMissingDateRates/addRates');
 const {
   getCurrenciesFromRequest,
   getDailyCurrency,
   getDailyHiveEngineRate,
 } = require('../../helpers/currencyHelper');
-const { ObjectId } = require('mongoose').Types;
 
 exports.checkRatesPeriod = async (startDate, endDate) => {
-//  await checkCurrenciesRates(startDate, endDate);
+  await checkCurrenciesRates(startDate, endDate);
   await checkCurrenciesStatistics(startDate, endDate);
   await checkHiveEngineRates(startDate, endDate);
   console.log('task completed!');
 };
 
-const getMissingDates = (data) => {
-  const missingDates = [];
-  for (let count = 0; count < data.length - 1; count++) {
-    const dayDifference = Math.abs(data[count].diff(data[count + 1], 'days'));
-    if (dayDifference > 1) {
-      missingDates.push(...collectDatesWithDifference(dayDifference, data[count]));
-    }
+const getMissingDates = ({ existingDates, startDate, endDate }) => {
+  if (!existingDates || !startDate || !endDate) return [];
+
+  const start = moment.utc(startDate).startOf('day');
+  const end = moment.utc(endDate).startOf('day');
+
+  if (!start.isValid() || !end.isValid() || end.isBefore(start)) return [];
+
+  const existingSet = new Set(
+    _.uniq(existingDates.map((d) => moment.utc(d).startOf('day').format('YYYY-MM-DD'))),
+  );
+
+  const missing = [];
+  const cursor = start.clone();
+  while (cursor.isSameOrBefore(end, 'day')) {
+    const key = cursor.format('YYYY-MM-DD');
+    if (!existingSet.has(key)) missing.push(cursor.clone().toDate());
+    cursor.add(1, 'day');
   }
 
-  return missingDates;
-};
-
-const collectDatesWithDifference = (dayDifference, date) => {
-  const missingDates = [];
-  for (let count = 1; count < dayDifference; count++) {
-    const dateToRemember = _.cloneDeep(date);
-    missingDates.push(dateToRemember.add(count, 'days').toDate());
-  }
-
-  return missingDates;
+  return missing;
 };
 
 const checkCurrenciesRates = async (startDate, endDate) => {
@@ -45,7 +46,7 @@ const checkCurrenciesRates = async (startDate, endDate) => {
       $gte: startDate,
       $lte: endDate,
     },
-  });
+  }, { dateString: 1 });
   if (error) {
     console.log('Error trying to get currencies rates');
     console.error(error);
@@ -53,7 +54,13 @@ const checkCurrenciesRates = async (startDate, endDate) => {
     return;
   }
 
-  const missingDates = getMissingDates(result.map((el) => moment(el.dateString)));
+  // build existing day keys from found records
+  const existing = result.map((el) => el.dateString);
+  const missingDates = getMissingDates({
+    existingDates: existing,
+    startDate: moment.utc(startDate).format('YYYY-MM-DD'),
+    endDate: moment.utc(endDate).format('YYYY-MM-DD'),
+  });
   for (const date of missingDates) await addRatesByDate({ date });
 };
 
@@ -73,7 +80,14 @@ const checkCurrenciesStatistics = async (startDate, endDate) => {
   }
 
   const dates = await getExistingDatesAndSetDailyData(result);
-  const missingDates = getMissingDates(dates.map((el) => moment(el).endOf('day')));
+  const normalized = dates.map((el) => moment.utc(el).format('YYYY-MM-DD'));
+  const rangeStart = _.min(normalized);
+  const rangeEnd = _.max(normalized);
+  const missingDates = getMissingDates({
+    existingDates: normalized,
+    startDate: rangeStart,
+    endDate: rangeEnd,
+  });
   const dataToSave = [];
   if (missingDates.length) {
     dataToSave.push(...await getCurrenciesStatisticsWithRequest(missingDates));
@@ -124,19 +138,30 @@ const getCurrenciesStatisticsWithRequest = async (dates) => {
       return [];
     }
 
+    const hiveUsd = _.get(hiveResult, 'market_data.current_price.usd');
+
+    const hiveBtc = _.get(hiveResult, 'market_data.current_price.btc');
+    if (!hiveUsd || !hiveBtc) {
+      console.log(`getCurrenciesFromRequest No Price for hive ${date}`);
+      continue;
+    }
+    const hbdUsd = _.get(hbdResult, 'market_data.current_price.usd');
+    const hbdBtc = _.get(hbdResult, 'market_data.current_price.btc');
+    const fallbackHbdBtc = (hiveBtc / hiveUsd);
+
     data.push({
       _id: new ObjectId(moment.utc(date).unix()),
       type: 'dailyData',
       hive: {
-        usd: hiveResult.market_data.current_price.usd,
+        usd: hiveUsd,
         usd_24h_change: 0,
-        btc: hiveResult.market_data.current_price.btc,
+        btc: hiveBtc,
         btc_24h_change: 0,
       },
       hive_dollar: {
-        usd: hbdResult.market_data.current_price.usd,
+        usd: hbdUsd ?? 1,
         usd_24h_change: 0,
-        btc: hbdResult.market_data.current_price.btc,
+        btc: hbdBtc ?? fallbackHbdBtc,
         btc_24h_change: 0,
       },
       createdAt: moment.utc(date).startOf('day'),
@@ -163,7 +188,14 @@ const checkHiveEngineRates = async (startDate, endDate) => {
   }
 
   const dates = await getExistingDatesAndSetDailyData(result, false);
-  const missingDates = getMissingDates(dates.map((el) => moment(el).endOf('day')));
+  const normalized = dates.map((el) => moment.utc(el).format('YYYY-MM-DD'));
+  const rangeStart = _.min(normalized);
+  const rangeEnd = _.max(normalized);
+  const missingDates = getMissingDates({
+    existingDates: normalized,
+    startDate: rangeStart,
+    endDate: rangeEnd,
+  });
 
   const dataToSave = [];
   if (missingDates.length) {
