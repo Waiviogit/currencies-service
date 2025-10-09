@@ -27,7 +27,6 @@ module.exports = async ({ date }) => {
 
   const updateData = _.reduce(RATE_CURRENCIES, (acc, el) => {
     acc[`rates.${el}`] = _.get(rateDate, `USD${el}`);
-    console.log();
     return acc;
   }, {});
 
