@@ -73,6 +73,7 @@ const checkCurrenciesRates = async (startDate, endDate) => {
 const checkCurrenciesStatistics = async (startDate, endDate) => {
   const { result, error } = await currenciesStatisticsModel.find({
     condition: {
+      type: 'dailyData',
       createdAt: { $gte: moment.utc(startDate).format(), $lte: moment.utc(endDate).format() },
     },
     limit: 0,
@@ -180,6 +181,7 @@ const getCurrenciesStatisticsWithRequest = async (dates) => {
 const checkHiveEngineRates = async (startDate, endDate) => {
   const { result, error } = await hiveEngineRateModel.find({
     condition: {
+      type: 'dailyData',
       dateString: {
         $gte: startDate,
         $lte: endDate,
