@@ -61,6 +61,8 @@ const checkCurrenciesRates = async (startDate, endDate) => {
     startDate: moment.utc(startDate).format('YYYY-MM-DD'),
     endDate: moment.utc(endDate).format('YYYY-MM-DD'),
   });
+  console.log('checkCurrenciesRates missing dates:');
+  console.table(missingDates);
   for (const date of missingDates) await addRatesByDate({ date });
 };
 
