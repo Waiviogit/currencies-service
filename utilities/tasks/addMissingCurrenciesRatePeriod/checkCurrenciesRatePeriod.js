@@ -139,7 +139,7 @@ const getCurrenciesStatisticsWithRequest = async (dates) => {
       date: moment(date).format('DD-MM-YYYY'),
       resource: 'history',
     });
-    if (hiveError || hbdError) {
+    if (hiveError) {
       console.log('Error trying to get currencies statistics history with request');
 
       return [];
