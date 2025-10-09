@@ -1,4 +1,5 @@
 const { currenciesRateModel, currenciesStatisticsModel, hiveEngineRateModel } = require('models');
+const { setTimeout } = require('node:timers/promises');
 const moment = require('moment');
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
@@ -63,7 +64,10 @@ const checkCurrenciesRates = async (startDate, endDate) => {
   });
   console.log('checkCurrenciesRates missing dates:');
   console.table(missingDates);
-  for (const date of missingDates) await addRatesByDate({ date });
+  for (const date of missingDates) {
+    await addRatesByDate({ date });
+    await setTimeout(1000);
+  }
 };
 
 const checkCurrenciesStatistics = async (startDate, endDate) => {
