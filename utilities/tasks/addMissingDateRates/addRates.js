@@ -23,7 +23,9 @@ module.exports = async ({ date }) => {
   });
   if (error) return console.error(missingDate, error);
   const rateDate = rates[missingDate];
-  if (!rateDate) return;
+  if (!rateDate) {
+    console.log(`no rateDate ${date}`, rates);
+  }
 
   const updateData = _.reduce(RATE_CURRENCIES, (acc, el) => {
     acc[`rates.${el}`] = _.get(rateDate, `USD${el}`);
