@@ -95,6 +95,9 @@ const checkCurrenciesStatistics = async (startDate, endDate) => {
     startDate: rangeStart,
     endDate: rangeEnd,
   });
+
+  console.log('checkCurrenciesStatistics missing dates:');
+  console.table(missingDates);
   const dataToSave = [];
   if (missingDates.length) {
     dataToSave.push(...await getCurrenciesStatisticsWithRequest(missingDates));
@@ -204,6 +207,9 @@ const checkHiveEngineRates = async (startDate, endDate) => {
     startDate: rangeStart,
     endDate: rangeEnd,
   });
+
+  console.log('checkHiveEngineRates missing dates:');
+  console.table(missingDates);
 
   const dataToSave = [];
   if (missingDates.length) {
