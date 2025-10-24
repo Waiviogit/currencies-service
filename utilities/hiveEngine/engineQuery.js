@@ -1,15 +1,16 @@
 const axios = require('axios');
 const _ = require('lodash');
+const { urlRotationManager } = require('./urlRotation');
 
-const { HIVE_ENGINE_NODES } = require('../../constants/serviceData');
-
-exports.engineQuery = async ({
-  hostUrl = 'https://herpc.dtools.dev',
+const engineQuery = async ({
   method = 'find',
   params,
   endpoint = '/contracts',
   id = 'ssc-mainnet-hive',
 }) => {
+  const startTime = Date.now();
+  const hostUrl = await urlRotationManager.getBestUrl();
+
   try {
     const instance = axios.create();
     const resp = await instance.post(
@@ -21,48 +22,62 @@ exports.engineQuery = async ({
         id,
       },
       {
-        timeout: 5000,
+        timeout: 15000,
       },
     );
-    return { result: _.get(resp, 'data.result') };
+
+    const responseTime = Date.now() - startTime;
+    const result = _.get(resp, 'data.result');
+
+    // Record successful request
+    await urlRotationManager.recordRequest(hostUrl, responseTime, false);
+
+    return result;
   } catch (error) {
+    const responseTime = Date.now() - startTime;
+    console.log(`Engine request error ${hostUrl}`);
+
+    // Record failed request
+    await urlRotationManager.recordRequest(hostUrl, responseTime, true);
+
     return { error };
   }
 };
 
-exports.engineProxy = async ({
-  hostUrl,
+const engineProxy = async ({
   method,
   params,
   endpoint,
   id,
   attempts = 5,
 }) => {
-  const response = await this.engineQuery({
-    hostUrl,
+  let remainingAttempts = attempts;
+
+  while (remainingAttempts > 0) {
+    const response = await engineQuery({
+      method,
+      params,
+      endpoint,
+      id,
+    });
+
+    if (!_.has(response, 'error')) {
+      return response;
+    }
+
+    remainingAttempts--;
+  }
+
+  // Final attempt with best available URL
+  return engineQuery({
     method,
     params,
     endpoint,
     id,
   });
-  if (_.has(response, 'error')) {
-    if (attempts <= 0) return response;
-    return this.engineProxy({
-      hostUrl: getNewNodeUrl(hostUrl),
-      method,
-      params,
-      endpoint,
-      id,
-      attempts: attempts - 1,
-    });
-  }
-  return response;
 };
 
-const getNewNodeUrl = (hostUrl) => {
-  const index = hostUrl ? HIVE_ENGINE_NODES.indexOf(hostUrl) : 0;
-
-  return index === HIVE_ENGINE_NODES.length - 1
-    ? HIVE_ENGINE_NODES[0]
-    : HIVE_ENGINE_NODES[index + 1];
+module.exports = {
+  engineProxy,
+  engineQuery,
 };

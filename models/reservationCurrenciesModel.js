@@ -1,6 +1,5 @@
 const { ReservationCurrenciesSchema } = require('database').models;
 
-
 exports.create = async (data) => {
   try {
     const newCurrencies = new ReservationCurrenciesSchema(data);

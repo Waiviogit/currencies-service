@@ -1,11 +1,22 @@
 FROM node:24-alpine
 
-RUN mkdir -p /usr/src/app
+# Create app directory and user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
 WORKDIR /usr/src/app
 
-COPY ./package.json ./
+# Copy package files
+COPY package*.json ./
 
-RUN npm install
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy application code
 COPY . .
+
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /usr/src/app
+USER nodejs
 
 CMD ["npm", "run", "start"]

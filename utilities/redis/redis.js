@@ -1,12 +1,8 @@
-const redis = require('redis');
-const bluebird = require('bluebird');
+const redis = require('ioredis');
 const config = require('../../config');
 
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
-
-const lastBlockClient = redis.createClient(process.env.REDISCLOUD_URL);
-const mainFeedCacheClient = redis.createClient(process.env.REDISCLOUD_URL);
+const lastBlockClient = redis.createClient();
+const mainFeedCacheClient = redis.createClient();
 
 lastBlockClient.select(config.redis.lastBlock);
 mainFeedCacheClient.select(config.redis.mainFeedsCache);
