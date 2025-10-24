@@ -1,6 +1,5 @@
 const _ = require('lodash');
-
-const { mainFeedsCacheClient } = require('../redis/redis');
+const { mainFeedCacheClient } = require('../redis/redis');
 const { HIVE_ENGINE_NODES } = require('../../constants/serviceData');
 
 const CACHE_PREFIX = 'engine_url_stats:';
@@ -13,7 +12,7 @@ const WEIGHT_FACTORS = {
 
 class UrlRotationManager {
   constructor() {
-    this.client = mainFeedsCacheClient;
+    this.client = mainFeedCacheClient;
   }
 
   async getUrlStats(url) {
