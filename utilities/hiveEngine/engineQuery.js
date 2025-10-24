@@ -32,7 +32,7 @@ const engineQuery = async ({
     // Record successful request
     await urlRotationManager.recordRequest(hostUrl, responseTime, false);
 
-    return result;
+    return { result };
   } catch (error) {
     const responseTime = Date.now() - startTime;
     console.log(`Engine request error ${hostUrl}`);
