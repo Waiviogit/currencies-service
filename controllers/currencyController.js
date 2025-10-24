@@ -97,7 +97,7 @@ const enginePoolsRate = async (req, res, next) => {
   if (!value) return;
   const { result, error } = await engineRates.getEnginePoolsRate(value);
   if (error) return next(error);
-  await addToCache({ key: cacheKey, data: result });
+  if (result.length) await addToCache({ key: cacheKey, data: result });
   res.status(200).json(result);
 };
 
