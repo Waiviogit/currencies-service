@@ -156,15 +156,32 @@ const getTokenPairArr = (symbols) => _.reduce(symbols, (acc, el) => {
   return acc;
 }, []);
 
-const getEnginePoolsRate = async ({ symbols }) => {
-  const { result: enginePools, error: enginePoolsError } = await marketPools
-    .getMarketPools({ query: { tokenPair: { $in: getTokenPairArr(symbols) } } });
-  if (enginePoolsError) return { error: enginePoolsError };
+const getHivePriceFromPool = async (pool) => {
+  if (pool) {
+    return parseFloat(pool.basePrice);
+  }
   const { result: price } = await getCurrentCurrencies({
     ids: serviceData.allowedIds,
     currencies: serviceData.allowedCurrencies,
     resource: 'coingecko',
   });
+
+  const hivePriceUsd = _.get(price, 'hive.usd');
+
+  return hivePriceUsd;
+};
+
+const getEnginePoolsRate = async ({ symbols }) => {
+  const hbdPoolName = 'SWAP.HIVE:SWAP.HBD';
+
+  const { result: enginePools, error: enginePoolsError } = await marketPools
+    .getMarketPools({ query: { tokenPair: { $in: [...getTokenPairArr(symbols), hbdPoolName] } } });
+  if (enginePoolsError) return { error: enginePoolsError };
+
+  const hbdPool = enginePools.find((el) => el.tokenPair === hbdPoolName);
+
+  const hivePriceUsd = await getHivePriceFromPool(hbdPool);
+
   const mappedBaseQuote = _.map(enginePools, (p) => {
     const [base, quote] = p.tokenPair.split(':');
     return {
@@ -173,7 +190,6 @@ const getEnginePoolsRate = async ({ symbols }) => {
       ...p,
     };
   });
-  const hivePriceUsd = _.get(price, 'hive.usd');
 
   const responseArray = _.reduce(symbols, (acc, el) => {
     if (el === 'SWAP.HIVE') {
