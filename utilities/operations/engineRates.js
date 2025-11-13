@@ -157,16 +157,18 @@ const getTokenPairArr = (symbols) => _.reduce(symbols, (acc, el) => {
 }, []);
 
 const getHivePriceFromPool = async (pool) => {
-  if (pool) {
-    return parseFloat(pool.basePrice);
-  }
   const { result: price } = await getCurrentCurrencies({
     ids: serviceData.allowedIds,
     currencies: serviceData.allowedCurrencies,
     resource: 'coingecko',
   });
-
+  const hiveDollarUsd = _.get(price, 'hive_dollar.usd', 1);
   const hivePriceUsd = _.get(price, 'hive.usd');
+  if (pool) {
+    const basePrice = (parseFloat(pool.quoteQuantity) * hiveDollarUsd)
+        / parseFloat(pool.baseQuantity);
+    return basePrice;
+  }
 
   return hivePriceUsd;
 };
