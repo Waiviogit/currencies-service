@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:24.22.1-alpine3.23
 
 # Create app directory and user
 RUN addgroup -g 1001 -S nodejs && \
